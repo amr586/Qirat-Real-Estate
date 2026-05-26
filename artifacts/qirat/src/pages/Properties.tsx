@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, ArrowRight, SlidersHorizontal, X } from "lucide-react";
+import {
+  MapPin, BedDouble, Bath, Maximize2, ArrowLeft, ArrowRight,
+  Search, SlidersHorizontal, ChevronDown, X, Star,
+} from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties, Property } from "../data/properties";
 
@@ -10,22 +13,119 @@ const fadeUp = {
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
+    transition: { delay: i * 0.08, duration: 0.5, ease: "easeOut" },
   }),
 };
 
-const LOCATION_MAP: Record<string, string[]> = {
-  "5th-settlement": ["التجمع الخامس", "5th Settlement", "New Cairo"],
-  "golden-square": ["جولدن سكوير", "Golden Square"],
-  "new-capital": ["العاصمة الإدارية", "New Capital"],
-  "6th-settlement": ["التجمع السادس", "6th Settlement"],
-  "heliopolis": ["مصر الجديدة", "Heliopolis"],
-  "sheikh-zayed": ["الشيخ زايد", "Sheikh Zayed"],
-};
+function inferUnitType(p: Property): string {
+  const title = p.titleAr + " " + p.titleEn;
+  if (/بنتهاوس|Penthouse/i.test(title)) return "penthouse";
+  if (/فيلا|Villa/i.test(title)) return "villa";
+  if (/تجاري|Commercial/i.test(title) || p.bedrooms === 0) return "commercial";
+  if (/شقة|Apartment/i.test(title)) return "apartment";
+  return "apartment";
+}
 
-function PropertyCard({ prop, index }: { prop: Property; index: number }) {
+function inferPurpose(p: Property): string {
+  if (p.bedrooms === 0 || p.type === "partnership") return "commercial";
+  return "residential";
+}
+
+function parseNumericPrice(price: string): number {
+  const n = price.replace(/[^0-9]/g, "");
+  return parseInt(n, 10) || 0;
+}
+
+const FEATURED_IDS = [1, 2, 3];
+
+const UNIT_TYPE_OPTIONS = [
+  { key: "", ar: "الكل", en: "All" },
+  { key: "apartment", ar: "شقة", en: "Apartment" },
+  { key: "villa", ar: "فيلا", en: "Villa" },
+  { key: "penthouse", ar: "بنتهاوس", en: "Penthouse" },
+  { key: "commercial", ar: "وحدة تجارية", en: "Commercial" },
+];
+
+const PURPOSE_OPTIONS = [
+  { key: "", ar: "الكل", en: "All" },
+  { key: "residential", ar: "سكني", en: "Residential" },
+  { key: "commercial", ar: "تجاري", en: "Commercial" },
+];
+
+const AD_TYPE_OPTIONS = [
+  { key: "", ar: "الكل", en: "All" },
+  { key: "sale", ar: "للبيع", en: "For Sale" },
+  { key: "rent", ar: "للإيجار", en: "For Rent" },
+  { key: "partnership", ar: "شراكة", en: "Partnership" },
+];
+
+const STATUS_OPTIONS = [
+  { key: "available", ar: "متاح", en: "Available" },
+];
+
+function SelectBox({
+  label, value, onChange, options, dir,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { key: string; ar: string; en: string }[];
+  dir: string;
+}) {
+  const { lang } = useLang();
+  return (
+    <div className="flex-1 min-w-[120px]">
+      <label className="block text-qirat-navy/50 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none px-3 py-2.5 rounded-xl border border-gray-200 text-qirat-navy text-sm font-semibold bg-white focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all cursor-pointer"
+          dir={dir}
+        >
+          {options.map((o) => (
+            <option key={o.key} value={o.key}>
+              {lang === "ar" ? o.ar : o.en}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/40 pointer-events-none"
+          style={{ [dir === "rtl" ? "left" : "right"]: "10px" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function PriceInput({
+  label, value, onChange, placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="flex-1 min-w-[130px]">
+      <label className="block text-qirat-navy/50 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+        {label}
+      </label>
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+      />
+    </div>
+  );
+}
+
+function PropertyCard({ prop, index, featured }: { prop: Property; index: number; featured?: boolean }) {
   const { t, lang } = useLang();
-
   const typeColors: Record<string, string> = {
     sale: "#1B3A6B",
     rent: "#C9A84C",
@@ -34,7 +134,7 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
 
   return (
     <motion.div
-      className="property-card bg-white rounded-3xl overflow-hidden shadow-lg"
+      className="property-card bg-white rounded-3xl overflow-hidden shadow-lg relative"
       variants={fadeUp}
       initial="hidden"
       animate="visible"
@@ -42,13 +142,25 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
       custom={index}
       layout
     >
+      {featured && (
+        <div
+          className="absolute top-4 right-4 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+          style={{ background: "rgba(201,168,76,0.95)", color: "white" }}
+        >
+          <Star className="w-3 h-3 fill-white" />
+          {t("مميز", "Featured")}
+        </div>
+      )}
       <div className="relative h-60 overflow-hidden">
         <img
           src={prop.image}
           alt={lang === "ar" ? prop.titleAr : prop.titleEn}
           className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute top-4 left-4">
+        <div
+          className="absolute top-4 left-4"
+          style={{ [lang === "ar" ? "left" : "right"]: "auto", [lang === "ar" ? "right" : "left"]: "16px" }}
+        >
           <span
             className="px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg"
             style={{ background: typeColors[prop.type] }}
@@ -66,12 +178,10 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
         >
           {lang === "ar" ? prop.titleAr : prop.titleEn}
         </h3>
-
         <div className="flex items-center gap-1.5 text-qirat-gold text-sm font-semibold mb-4">
           <MapPin className="w-3.5 h-3.5" />
           {lang === "ar" ? prop.locationAr : prop.locationEn}
         </div>
-
         <div className="flex gap-4 text-qirat-navy/60 text-sm mb-5 flex-wrap">
           {prop.bedrooms > 0 && (
             <div className="flex items-center gap-1.5">
@@ -88,12 +198,9 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
             <span>{prop.area} {t("م²", "m²")}</span>
           </div>
         </div>
-
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div>
-            <span className="text-qirat-navy text-xl font-black">
-              {prop.price}
-            </span>
+            <span className="text-qirat-navy text-xl font-black">{prop.price}</span>
             <span className="text-qirat-navy/50 text-xs mr-1">{t("ج.م", "EGP")}</span>
           </div>
           <Link href={`/properties/${prop.id}`}>
@@ -112,78 +219,98 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
   );
 }
 
-function parsePrice(priceStr: string): number {
-  return parseInt(priceStr.replace(/,/g, ""), 10) || 0;
-}
-
 export default function Properties() {
   const { t, lang, dir } = useLang();
   const searchString = useSearch();
 
-  const params = new URLSearchParams(searchString);
-  const urlType = (params.get("type") as "all" | "sale" | "rent" | "partnership") || "all";
-  const urlQ = params.get("q") || "";
-  const urlMinPrice = params.get("minPrice") || "";
-  const urlMaxPrice = params.get("maxPrice") || "";
-  const urlMinArea = params.get("minArea") || "";
-  const urlMaxArea = params.get("maxArea") || "";
-  const urlLocation = params.get("location") || "";
+  const params = useMemo(() => new URLSearchParams(searchString), [searchString]);
 
-  const [filter, setFilter] = useState<"all" | "sale" | "rent" | "partnership">(urlType);
+  const [searchText, setSearchText] = useState(params.get("q") || "");
+  const [showFilters, setShowFilters] = useState(!!searchString);
+  const [unitType, setUnitType] = useState(params.get("unitType") || "");
+  const [purpose, setPurpose] = useState(params.get("purpose") || "");
+  const [zone, setZone] = useState(params.get("location") || "");
+  const [adType, setAdType] = useState((params.get("type") as "sale" | "rent" | "partnership" | "") || "");
+  const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
+  const [minArea, setMinArea] = useState(params.get("minArea") || "");
+  const [maxArea, setMaxArea] = useState(params.get("maxArea") || "");
+  const [featuredOnly, setFeaturedOnly] = useState(params.get("featured") === "1");
 
-  useEffect(() => {
-    setFilter(urlType);
-  }, [urlType]);
+  const zones = useMemo(() => {
+    const seen = new Set<string>();
+    return properties
+      .map((p) => ({ ar: p.locationAr.split("،")[0].trim(), en: p.locationEn.split(",")[0].trim() }))
+      .filter((z) => {
+        const key = z.ar;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  }, []);
 
-  const hasActiveFilters = urlQ || urlMinPrice || urlMaxPrice || urlMinArea || urlMaxArea || urlLocation;
+  const zoneOptions = useMemo(() => [
+    { key: "", ar: "الكل", en: "All" },
+    ...zones.map((z) => ({ key: z.ar, ar: z.ar, en: z.en })),
+  ], [zones]);
 
-  const filtered = properties.filter((p) => {
-    if (filter !== "all" && p.type !== filter) return false;
-
-    if (urlQ) {
-      const q = urlQ.toLowerCase();
-      const matchTitle = p.titleAr.toLowerCase().includes(q) || p.titleEn.toLowerCase().includes(q);
-      const matchLocation = p.locationAr.toLowerCase().includes(q) || p.locationEn.toLowerCase().includes(q);
-      if (!matchTitle && !matchLocation) return false;
-    }
-
-    if (urlMinPrice) {
-      const propPrice = parsePrice(p.price);
-      if (propPrice < parseInt(urlMinPrice, 10)) return false;
-    }
-    if (urlMaxPrice) {
-      const propPrice = parsePrice(p.price);
-      if (propPrice > parseInt(urlMaxPrice, 10)) return false;
-    }
-
-    if (urlMinArea && p.area < parseInt(urlMinArea, 10)) return false;
-    if (urlMaxArea && p.area > parseInt(urlMaxArea, 10)) return false;
-
-    if (urlLocation && urlLocation !== "other") {
-      const keywords = LOCATION_MAP[urlLocation] || [];
-      const loc = (p.locationAr + " " + p.locationEn).toLowerCase();
-      if (!keywords.some((kw) => loc.includes(kw.toLowerCase()))) return false;
-    }
-
-    return true;
-  });
-
-  const filters = [
-    { key: "all", ar: "الكل", en: "All" },
-    { key: "sale", ar: "للبيع", en: "For Sale" },
-    { key: "rent", ar: "للإيجار", en: "For Rent" },
-    { key: "partnership", ar: "شراكة", en: "Partnership" },
-  ] as const;
+  const hasActiveFilters = searchText || unitType || purpose || zone || adType || minPrice || maxPrice || minArea || maxArea || featuredOnly;
 
   const clearFilters = () => {
-    window.location.href = "/properties";
+    setSearchText("");
+    setUnitType("");
+    setPurpose("");
+    setZone("");
+    setAdType("");
+    setMinPrice("");
+    setMaxPrice("");
+    setMinArea("");
+    setMaxArea("");
+    setFeaturedOnly(false);
   };
+
+  const filtered = useMemo(() => {
+    return properties.filter((p) => {
+      if (searchText.trim()) {
+        const q = searchText.toLowerCase();
+        const match =
+          p.titleAr.toLowerCase().includes(q) ||
+          p.titleEn.toLowerCase().includes(q) ||
+          p.locationAr.toLowerCase().includes(q) ||
+          p.locationEn.toLowerCase().includes(q);
+        if (!match) return false;
+      }
+
+      if (unitType && inferUnitType(p) !== unitType) return false;
+      if (purpose && inferPurpose(p) !== purpose) return false;
+
+      if (zone) {
+        const loc = p.locationAr + " " + p.locationEn;
+        if (!loc.includes(zone)) return false;
+      }
+
+      if (adType && p.type !== adType) return false;
+
+      const numericPrice = parseNumericPrice(p.price);
+      if (minPrice && numericPrice < parseInt(minPrice, 10)) return false;
+      if (maxPrice && numericPrice > parseInt(maxPrice, 10)) return false;
+
+      if (minArea && p.area < parseInt(minArea, 10)) return false;
+      if (maxArea && p.area > parseInt(maxArea, 10)) return false;
+
+      if (featuredOnly && !FEATURED_IDS.includes(p.id)) return false;
+
+      return true;
+    });
+  }, [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly]);
+
+  const activeCount = [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly].filter(Boolean).length;
 
   return (
     <div dir={dir} className="pt-20">
       {/* Hero */}
       <div
-        className="relative py-28 px-4 overflow-hidden"
+        className="relative py-20 px-4 overflow-hidden"
         style={{ background: "linear-gradient(135deg, #1B3A6B 0%, #0F2347 100%)" }}
       >
         <div className="absolute inset-0 opacity-10">
@@ -193,13 +320,13 @@ export default function Properties() {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="relative max-w-4xl mx-auto text-center">
+        <div className="relative max-w-5xl mx-auto text-center">
           <motion.span
-            className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-4 block"
+            className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-3 block"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {t("كل العقارات في مكان واحد", "All Properties in One Place")}
+            {t("أكثر من 100 عقار في مختلف الأماكن · ابحث، قارن وتواصل معنا", "100+ properties across Cairo · Search, compare and contact us")}
           </motion.span>
           <motion.h1
             className="text-5xl md:text-6xl font-black text-white mb-6"
@@ -208,133 +335,233 @@ export default function Properties() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            {t("عقارات القاهرة", "Cairo Properties")}
+            {t("تصفح العقارات", "Browse Properties")}
           </motion.h1>
           <div className="section-divider" />
-          <motion.p
-            className="text-white/75 text-lg mt-6 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            {t(
-              "تصفح أفضل العقارات في القاهرة — سكنية وتجارية — بأسعار تنافسية وخدمة احترافية",
-              "Browse the best properties in Cairo — residential and commercial — at competitive prices with professional service"
-            )}
-          </motion.p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="sticky top-20 z-20 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      {/* Sticky filter bar */}
+      <div className="sticky top-20 z-20 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <SlidersHorizontal className="w-5 h-5 text-qirat-navy/50 flex-shrink-0" />
-            {filters.map((f) => (
-              <motion.button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
-                className="px-5 py-2 rounded-full text-sm font-semibold transition-all"
-                style={
-                  filter === f.key
-                    ? { background: "#1B3A6B", color: "white", boxShadow: "0 4px 12px rgba(27,58,107,0.3)" }
-                    : { background: "#F5F5F0", color: "#1B3A6B" }
-                }
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {t(f.ar, f.en)}
-                <span className="ml-2 opacity-60 text-xs">
-                  ({f.key === "all" ? properties.length : properties.filter((p) => p.type === f.key).length})
+
+          {/* Search row */}
+          <div className="flex gap-3 items-center">
+            <div className="relative flex-1">
+              <Search
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/40"
+                style={{ [dir === "rtl" ? "right" : "left"]: "14px" }}
+              />
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => e.key === "Escape" && setSearchText("")}
+                placeholder={t("ابحث عن عقار...", "Search for a property...")}
+                className="w-full py-2.5 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+                style={{
+                  [dir === "rtl" ? "paddingRight" : "paddingLeft"]: "40px",
+                  [dir === "rtl" ? "paddingLeft" : "paddingRight"]: "14px",
+                }}
+              />
+            </div>
+
+            <motion.button
+              onClick={() => setShowFilters((v) => !v)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all flex-shrink-0"
+              style={{
+                borderColor: showFilters ? "#C9A84C" : "#e5e7eb",
+                color: showFilters ? "#C9A84C" : "#1B3A6B",
+                background: showFilters ? "rgba(201,168,76,0.06)" : "white",
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              {t("فلاتر", "Filters")}
+              {activeCount > 0 && (
+                <span
+                  className="w-5 h-5 rounded-full text-xs font-bold text-white flex items-center justify-center"
+                  style={{ background: "#C9A84C" }}
+                >
+                  {activeCount}
                 </span>
-              </motion.button>
-            ))}
+              )}
+            </motion.button>
 
             {hasActiveFilters && (
               <motion.button
                 onClick={clearFilters}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold ml-auto"
-                style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0"
+                style={{ color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)", background: "rgba(201,168,76,0.06)" }}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
               >
                 <X className="w-3.5 h-3.5" />
-                {t("مسح الفلاتر", "Clear Filters")}
+                {t("مسح", "Clear")}
               </motion.button>
             )}
           </div>
 
-          {hasActiveFilters && (
-            <motion.div
-              className="flex flex-wrap gap-2 mt-3"
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {urlQ && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
-                  {t("بحث:", "Search:")} {urlQ}
-                </span>
-              )}
-              {urlLocation && urlLocation !== "other" && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
-                  📍 {lang === "ar"
-                    ? (LOCATION_MAP[urlLocation]?.[0] || urlLocation)
-                    : (LOCATION_MAP[urlLocation]?.[1] || urlLocation)}
-                </span>
-              )}
-              {(urlMinPrice || urlMaxPrice) && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
-                  💰 {urlMinPrice ? `${Number(urlMinPrice).toLocaleString()}` : "0"} — {urlMaxPrice ? `${Number(urlMaxPrice).toLocaleString()}` : "∞"} {t("ج.م", "EGP")}
-                </span>
-              )}
-              {(urlMinArea || urlMaxArea) && (
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
-                  📐 {urlMinArea || "0"} — {urlMaxArea || "∞"} {t("م²", "m²")}
-                </span>
-              )}
-            </motion.div>
-          )}
+          {/* Expanded filter panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 space-y-4">
+                  {/* Dropdowns row */}
+                  <div className="flex flex-wrap gap-3">
+                    <SelectBox
+                      label={t("نوع الوحدة", "Unit Type")}
+                      value={unitType}
+                      onChange={setUnitType}
+                      options={UNIT_TYPE_OPTIONS}
+                      dir={dir}
+                    />
+                    <SelectBox
+                      label={t("الغرض", "Purpose")}
+                      value={purpose}
+                      onChange={setPurpose}
+                      options={PURPOSE_OPTIONS}
+                      dir={dir}
+                    />
+                    <SelectBox
+                      label={t("المنطقة", "Zone")}
+                      value={zone}
+                      onChange={setZone}
+                      options={zoneOptions}
+                      dir={dir}
+                    />
+                    <SelectBox
+                      label={t("نوع الإعلان", "Ad Type")}
+                      value={adType}
+                      onChange={setAdType}
+                      options={AD_TYPE_OPTIONS}
+                      dir={dir}
+                    />
+                    <SelectBox
+                      label={t("الحالة", "Status")}
+                      value="available"
+                      onChange={() => {}}
+                      options={STATUS_OPTIONS}
+                      dir={dir}
+                    />
+                  </div>
+
+                  {/* Price + Area */}
+                  <div className="flex flex-wrap gap-3">
+                    <PriceInput
+                      label={t("السعر الأدنى (ج)", "Min Price (EGP)")}
+                      value={minPrice}
+                      onChange={setMinPrice}
+                      placeholder={t("0", "0")}
+                    />
+                    <PriceInput
+                      label={t("السعر الأقصى (ج)", "Max Price (EGP)")}
+                      value={maxPrice}
+                      onChange={setMaxPrice}
+                      placeholder={t("غير محدد", "Unlimited")}
+                    />
+                    <PriceInput
+                      label={t("المساحة الأدنى (م²)", "Min Area (m²)")}
+                      value={minArea}
+                      onChange={setMinArea}
+                      placeholder={t("0", "0")}
+                    />
+                    <PriceInput
+                      label={t("المساحة الأقصى (م²)", "Max Area (m²)")}
+                      value={maxArea}
+                      onChange={setMaxArea}
+                      placeholder={t("غير محدد", "Unlimited")}
+                    />
+
+                    {/* Featured checkbox */}
+                    <div className="flex items-end pb-0.5 min-w-[140px]">
+                      <label className="flex items-center gap-2.5 cursor-pointer group">
+                        <div
+                          className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                          style={{
+                            borderColor: featuredOnly ? "#C9A84C" : "#d1d5db",
+                            background: featuredOnly ? "#C9A84C" : "white",
+                          }}
+                          onClick={() => setFeaturedOnly((v) => !v)}
+                        >
+                          {featuredOnly && (
+                            <motion.svg
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-3 h-3 text-white"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                            >
+                              <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </motion.svg>
+                          )}
+                        </div>
+                        <span className="text-qirat-navy text-sm font-semibold flex items-center gap-1.5">
+                          <Star className="w-3.5 h-3.5 text-qirat-gold" />
+                          {t("عقارات مميزة", "Featured Only")}
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
       {/* Grid */}
-      <section className="py-16 px-4 bg-qirat-cream min-h-[50vh]">
+      <section className="py-12 px-4 bg-qirat-cream min-h-[50vh]">
         <div className="max-w-7xl mx-auto">
           <motion.p
             className="text-qirat-navy/50 text-sm mb-8"
-            key={`${filter}-${searchString}`}
+            key={`${searchText}-${unitType}-${purpose}-${zone}-${adType}-${minPrice}-${maxPrice}-${minArea}-${maxArea}-${featuredOnly}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            {t(`عرض ${filtered.length} عقار`, `Showing ${filtered.length} properties`)}
+            {t(`عرض ${filtered.length} عقار`, `Showing ${filtered.length} ${filtered.length === 1 ? "property" : "properties"}`)}
           </motion.p>
 
           <AnimatePresence mode="popLayout">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {filtered.map((prop, i) => (
-                <PropertyCard key={prop.id} prop={prop} index={i} />
+                <PropertyCard
+                  key={prop.id}
+                  prop={prop}
+                  index={i}
+                  featured={FEATURED_IDS.includes(prop.id)}
+                />
               ))}
             </div>
           </AnimatePresence>
 
           {filtered.length === 0 && (
             <motion.div
-              className="text-center py-20"
+              className="text-center py-24"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
               <div className="text-5xl mb-4">🔍</div>
               <p className="text-qirat-navy/40 text-xl mb-4">
-                {t("لا توجد عقارات مطابقة", "No matching properties")}
+                {t("لا توجد عقارات مطابقة للفلتر", "No properties match your filters")}
               </p>
-              <button
+              <motion.button
                 onClick={clearFilters}
                 className="btn-gold px-6 py-3 rounded-xl font-bold text-sm"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
               >
                 {t("عرض جميع العقارات", "Show All Properties")}
-              </button>
+              </motion.button>
             </motion.div>
           )}
         </div>
