@@ -143,7 +143,7 @@ export default function Home() {
           <div className="video-overlay absolute inset-0" style={{ zIndex: 2 }} />
         </motion.div>
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-32">
           <div className="h-24 md:h-32 flex items-center justify-center overflow-hidden mb-4">
             <AnimatePresence mode="wait">
               <motion.h1

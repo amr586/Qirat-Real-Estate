@@ -110,33 +110,29 @@ export default function Navbar() {
         {menuOpen && (
           <motion.div
             dir={dir}
-            className="fixed inset-0 z-30 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="fixed top-20 left-0 right-0 z-30 md:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              background: "rgba(15, 35, 71, 0.98)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid rgba(201,168,76,0.2)",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+            }}
           >
-            <div
-              className="absolute inset-0"
-              style={{ background: "rgba(15, 35, 71, 0.98)" }}
-              onClick={() => setMenuOpen(false)}
-            />
-            <motion.div
-              className="relative flex flex-col items-center justify-center h-full gap-8"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-            >
-              <img src="/qirat-logo-transparent.png" alt="قيراط" className="h-20 w-auto object-contain mb-4" />
+            <div className="flex flex-col px-6 py-4 gap-1">
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
+                  initial={{ opacity: 0, x: dir === "rtl" ? 16 : -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.06 }}
                 >
                   <Link href={link.href}>
                     <span
-                      className={`text-2xl font-bold cursor-pointer ${
+                      className={`block py-3 text-lg font-bold cursor-pointer border-b border-white/10 last:border-0 ${
                         isActive(link.href) ? "text-qirat-gold" : "text-white hover:text-qirat-gold"
                       } transition-colors`}
                       onClick={() => setMenuOpen(false)}
@@ -147,7 +143,7 @@ export default function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
