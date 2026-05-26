@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
 import HomeSearch from "../components/HomeSearch";
+
+const BG_VIDEOS = [
+  "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-residential-neighborhood-41890-large.mp4",
+  "https://assets.mixkit.co/videos/preview/mixkit-luxury-villa-overlooking-the-sea-45422-large.mp4",
+  "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-44882-large.mp4",
+  "https://assets.mixkit.co/videos/preview/mixkit-drone-view-of-a-suburban-neighborhood-41893-large.mp4",
+];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -64,9 +71,12 @@ const HERO_WORDS_EN = ["QIRAT", "TRUST", "QUALITY", "QIRAT"];
 export default function Home() {
   const { t, lang, dir } = useLang();
   const heroRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef });
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const [wordIndex, setWordIndex] = useState(0);
+  const [videoIndex, setVideoIndex] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -75,6 +85,18 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  const handleVideoEnded = useCallback(() => {
+    setVideoLoaded(false);
+    setVideoIndex((i) => (i + 1) % BG_VIDEOS.length);
+  }, []);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.load();
+    vid.play().catch(() => {});
+  }, [videoIndex]);
+
   const words = lang === "ar" ? HERO_WORDS_AR : HERO_WORDS_EN;
 
   return (
@@ -82,7 +104,7 @@ export default function Home() {
       {/* Hero */}
       <div ref={heroRef} className="relative min-h-screen min-h-[820px] overflow-hidden">
         <motion.div className="absolute inset-0" style={{ y: videoY }}>
-          {/* Fallback background image */}
+          {/* Fallback background image (shows while video loads) */}
           <div
             className="absolute inset-0"
             style={{
@@ -92,26 +114,32 @@ export default function Home() {
               zIndex: 0,
             }}
           />
-          {/* YouTube background video */}
-          <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 1 }}>
-            <iframe
-              src="https://www.youtube.com/embed/LKnqECcg6Gw?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&playlist=LKnqECcg6Gw&modestbranding=1&showinfo=0&rel=0&playsinline=1&iv_load_policy=3&fs=0"
-              allow="autoplay; encrypted-media"
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "177.78vh",
-                minWidth: "100%",
-                height: "56.25vw",
-                minHeight: "100%",
-                border: "none",
-                pointerEvents: "none",
-              }}
-              title="background video"
-            />
-          </div>
+          {/* Real estate background video */}
+          <AnimatePresence>
+            {videoLoaded && (
+              <motion.div
+                className="absolute inset-0"
+                style={{ zIndex: 1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.2 }}
+              />
+            )}
+          </AnimatePresence>
+          <video
+            ref={videoRef}
+            key={videoIndex}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ zIndex: 1 }}
+            autoPlay
+            muted
+            playsInline
+            onCanPlay={() => setVideoLoaded(true)}
+            onEnded={handleVideoEnded}
+          >
+            <source src={BG_VIDEOS[videoIndex]} type="video/mp4" />
+          </video>
           <div className="video-overlay absolute inset-0" style={{ zIndex: 2 }} />
         </motion.div>
 
