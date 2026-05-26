@@ -16,22 +16,39 @@ const fadeUp = {
 
 function AnimatedStat({ value, label }: { value: string; label: string }) {
   const [count, setCount] = useState(0);
+  const [triggered, setTriggered] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const num = parseInt(value.replace(/\D/g, ""));
   const suffix = value.replace(/[0-9]/g, "");
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setTriggered(true); observer.disconnect(); } },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!triggered) return;
     let start = 0;
-    const step = Math.ceil(num / 60);
+    const duration = 1800;
+    const steps = 80;
+    const interval = duration / steps;
+    const step = num / steps;
     const timer = setInterval(() => {
       start += step;
       if (start >= num) { setCount(num); clearInterval(timer); }
-      else setCount(start);
-    }, 30);
+      else setCount(Math.floor(start));
+    }, interval);
     return () => clearInterval(timer);
-  }, [num]);
+  }, [triggered, num]);
 
   return (
-    <div className="text-center">
+    <div ref={ref} className="text-center">
       <div className="text-4xl font-black text-shimmer mb-2">
         {count.toLocaleString()}{suffix}
       </div>
