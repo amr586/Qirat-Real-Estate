@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 40 20% 96%;
+  --foreground: 220 60% 15%;
+  --border: 220 20% 80%;
+  --input: 220 20% 80%;
+  --ring: 43 62% 55%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 60% 15%;
+  --primary: 220 60% 25%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 43 62% 55%;
+  --secondary-foreground: 220 60% 15%;
+  --muted: 220 15% 90%;
+  --muted-foreground: 220 20% 45%;
+  --accent: 43 62% 55%;
+  --accent-foreground: 220 60% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --app-font-sans: 'Cairo', 'Montserrat', sans-serif;
+  --radius: 0.5rem;
+
+  /* Qirat brand colors */
+  --qirat-navy: #1B3A6B;
+  --qirat-navy-dark: #0F2347;
+  --qirat-gold: #C9A84C;
+  --qirat-gold-light: #E8C97A;
+  --qirat-gold-dark: #A8872E;
+  --qirat-white: #FFFFFF;
+  --qirat-cream: #F8F6F0;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    overflow-x: hidden;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* RTL support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Qirat brand classes */
+.bg-qirat-navy { background-color: var(--qirat-navy); }
+.bg-qirat-gold { background-color: var(--qirat-gold); }
+.text-qirat-navy { color: var(--qirat-navy); }
+.text-qirat-gold { color: var(--qirat-gold); }
+.border-qirat-gold { border-color: var(--qirat-gold); }
+.border-qirat-navy { border-color: var(--qirat-navy); }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-dark {
+  background: rgba(27, 58, 107, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+/* Gold gradient text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #A8872E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated underline */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--qirat-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: scaleX(1);
+}
+
+/* Video overlay */
+.video-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(27, 58, 107, 0.65) 0%,
+    rgba(27, 58, 107, 0.45) 50%,
+    rgba(15, 35, 71, 0.75) 100%
+  );
+}
+
+/* Loading screen */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--qirat-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Property card hover */
+.property-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.property-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 60px rgba(27, 58, 107, 0.2);
+}
+
+/* Gold button */
+.btn-gold {
+  background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #C9A84C 100%);
+  background-size: 200% auto;
+  color: #1B3A6B;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background-position: right center;
+  box-shadow: 0 8px 25px rgba(201, 168, 76, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Section divider */
+.section-divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--qirat-gold), var(--qirat-gold-light));
+  margin: 16px auto;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Qirat animated text */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--qirat-gold) 0%,
+    var(--qirat-gold-light) 30%,
+    #ffffff 50%,
+    var(--qirat-gold-light) 70%,
+    var(--qirat-gold) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Gold pulse */
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(201, 168, 76, 0); }
+}
+
+.pulse-gold {
+  animation: goldPulse 2s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}

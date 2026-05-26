@@ -1,44 +1,63 @@
-# [Project name]
+# قيراط — Qirat Real Estate
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A bilingual (Arabic/English) real estate portfolio website for the Qirat mobile app, showcasing Cairo properties with animations, contact forms, and an app download banner.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/qirat run dev` — run the frontend (port auto-assigned)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
 - `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: None for frontend. `DATABASE_URL` needed for API server.
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React + Vite + Tailwind CSS + Framer Motion
+- Routing: Wouter
+- Email: @emailjs/browser (needs configuration)
+- Fonts: Cairo (Arabic) + Montserrat (English) via Google Fonts
+- Build: Vite
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/qirat/` — main frontend React app
+  - `src/contexts/LanguageContext.tsx` — Arabic/English toggle context
+  - `src/data/properties.ts` — 5 Cairo property listings
+  - `src/pages/` — Home, About, Services, Properties, PropertyDetail, Contact
+  - `src/components/` — Navbar, Footer, LoadingScreen, AppDownloadBanner
+  - `public/qirat-logo.jpg` — brand logo
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Static frontend only — no backend needed for the portfolio site
+- EmailJS used for contact forms (configure service/template IDs in PropertyDetail.tsx and Contact.tsx)
+- Language context wraps the entire app; all text uses `t(ar, en)` helper
+- Loading screen shows logo for 2.8s then fades out with framer-motion
+- Hero background: video with image fallback (Cairo city aerial photo)
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Home page: animated "قيراط" word cycle with shimmer effect, video/image hero, stats, featured properties
+- About page: team, mission/vision/values, company story
+- Services: 6 real estate services (buy, sell, rent, partnership, valuation, legal)
+- Properties: 5 Cairo listings with type filter (all/sale/rent/partnership)
+- Property detail: full info + contact form → amrw4634@gmail.com
+- Contact page: full form → amrw4634@gmail.com
+- App download banner: appears 4s after page load
+- Language toggle: Arabic ↔ English (all text translates)
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Brand colors: Navy Blue #1B3A6B + Gold #C9A84C
+- Fonts: Cairo (AR) + Montserrat (EN)
+- Email for all contact forms: amrw4634@gmail.com
+- App link for download banner: TBD (user will provide)
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- EmailJS credentials needed: replace `YOUR_SERVICE_ID`, `YOUR_TEMPLATE_ID`, `YOUR_PUBLIC_KEY` in Contact.tsx and PropertyDetail.tsx
+- Google Fonts must be loaded from index.html `<link>` tag, NOT from CSS `@import` (PostCSS conflict with Tailwind)
+- Video background uses fallback image if CDN video is blocked
 
 ## Pointers
 
