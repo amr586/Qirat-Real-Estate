@@ -100,9 +100,14 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-qirat-gold flex-shrink-0 mt-0.5" />
-                <span className="text-white/65 text-sm">
+                <a
+                  href="https://www.google.com/maps/search/القاهرة،+مصر"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/65 hover:text-qirat-gold text-sm transition-colors"
+                >
                   {t("القاهرة، جمهورية مصر العربية", "Cairo, Arab Republic of Egypt")}
-                </span>
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-qirat-gold flex-shrink-0" />
