@@ -15,7 +15,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
-            <img src="/qirat-logo.jpg" alt="قيراط" className="h-20 w-auto rounded-xl mb-4" />
+            <Link href="/">
+              <motion.img
+                src="/qirat-logo-transparent.png"
+                alt="قيراط"
+                className="h-20 w-auto object-contain mb-4 cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+              />
+            </Link>
             <p className="text-white/65 text-sm leading-relaxed">
               {t(
                 "قيراط — شريكك الموثوق في سوق العقارات المصري. نقدم أفضل الفرص العقارية في القاهرة بشفافية واحترافية.",

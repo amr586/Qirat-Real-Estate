@@ -51,9 +51,9 @@ export default function Navbar() {
                 whileHover={{ scale: 1.02 }}
               >
                 <img
-                  src="/qirat-logo.jpg"
+                  src="/qirat-logo-transparent.png"
                   alt="قيراط"
-                  className="h-12 w-auto object-contain rounded-lg"
+                  className="h-12 w-auto object-contain"
                 />
               </motion.div>
             </Link>
