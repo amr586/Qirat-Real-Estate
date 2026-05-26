@@ -73,11 +73,15 @@ export default function Home() {
             style={{ zIndex: 0 }}
           >
             <source
-              src="https://cdn.coverr.co/videos/coverr-aerial-view-of-city-buildings-4798/1080p.mp4"
+              src="https://assets.mixkit.co/videos/preview/mixkit-tour-of-a-luxury-apartment-49671-large.mp4"
               type="video/mp4"
             />
             <source
-              src="https://www.w3schools.com/html/mov_bbb.mp4"
+              src="https://assets.mixkit.co/videos/preview/mixkit-modern-luxury-apartment-hallway-4015-large.mp4"
+              type="video/mp4"
+            />
+            <source
+              src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-residential-area-4026-large.mp4"
               type="video/mp4"
             />
           </video>
@@ -85,7 +89,7 @@ export default function Home() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: "url(https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1920&q=80)",
+              backgroundImage: "url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               zIndex: -1,
