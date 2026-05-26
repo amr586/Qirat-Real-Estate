@@ -161,7 +161,7 @@ export default function Home() {
           </div>
 
           <motion.p
-            className="text-white/80 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed"
+            className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed text-[#1515a3cc]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.7 }}
@@ -203,7 +203,6 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
-
       {/* Stats */}
       <section
         style={{ background: "linear-gradient(135deg, #1B3A6B 0%, #0F2347 100%)" }}
@@ -220,7 +219,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
       {/* Featured Properties */}
       <section className="py-20 px-4 bg-qirat-cream">
         <div className="max-w-7xl mx-auto">
@@ -310,7 +308,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Why Qirat */}
       <section
         className="py-20 px-4"
@@ -381,7 +378,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* CTA */}
       <section className="py-20 px-4 bg-qirat-cream">
         <div className="max-w-3xl mx-auto text-center">
