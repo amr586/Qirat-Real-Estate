@@ -149,8 +149,8 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
           className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
         />
         <div
-          className="absolute top-4 left-4"
-          style={{ [lang === "ar" ? "left" : "right"]: "auto", [lang === "ar" ? "right" : "left"]: "16px" }}
+          className="absolute top-4 flex items-center gap-2"
+          style={{ [lang === "ar" ? "right" : "left"]: "16px" }}
         >
           <span
             className="px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg"
@@ -158,6 +158,15 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
           >
             {lang === "ar" ? prop.typeAr : prop.typeEn}
           </span>
+          {featured && (
+            <span
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg"
+              style={{ background: "rgba(201,168,76,0.95)" }}
+            >
+              <Star className="w-3 h-3 fill-white" />
+              {t("مميز", "Featured")}
+            </span>
+          )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
