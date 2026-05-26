@@ -179,10 +179,15 @@ export default function PropertyDetail() {
             >
               {lang === "ar" ? property.titleAr : property.titleEn}
             </h1>
-            <div className="flex items-center gap-2 text-white/80">
+            <a
+              href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? property.locationAr : property.locationEn)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-white/80 hover:text-qirat-gold transition-colors"
+            >
               <MapPin className="w-4 h-4 text-qirat-gold" />
               <span>{lang === "ar" ? property.locationAr : property.locationEn}</span>
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -474,9 +479,15 @@ export default function PropertyDetail() {
               variants={fadeUp} initial="hidden" animate="visible" custom={7}
             >
               <h2 className="text-xl font-bold text-qirat-navy mb-2 self-start">{t("موقع العقار", "Property Location")}</h2>
-              <p className="text-qirat-navy/50 text-sm mb-7 self-start">
+              <a
+                href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? property.locationAr : property.locationEn)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-qirat-navy/50 hover:text-qirat-gold text-sm mb-7 self-start flex items-center gap-1.5 transition-colors"
+              >
+                <MapPin className="w-3.5 h-3.5 text-qirat-gold flex-shrink-0" />
                 {lang === "ar" ? property.locationAr : property.locationEn}
-              </p>
+              </a>
               <div className="relative flex items-center justify-center" style={{ width: 290, height: 290 }}>
                 <motion.div
                   className="absolute rounded-full"
