@@ -73,11 +73,11 @@ export default function Home() {
             style={{ zIndex: 0 }}
           >
             <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-tour-of-a-luxury-apartment-49671-large.mp4"
+              src="https://videos.pexels.com/video-files/3255536/3255536-hd_1280_720_24fps.mp4"
               type="video/mp4"
             />
             <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-modern-luxury-apartment-hallway-4015-large.mp4"
+              src="https://videos.pexels.com/video-files/3048888/3048888-hd_1280_720_24fps.mp4"
               type="video/mp4"
             />
             <source
@@ -89,7 +89,7 @@ export default function Home() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: "url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80)",
+              backgroundImage: "url(https://images.unsplash.com/photo-1572977446469-1e2b66734cdf?w=1920&q=80)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               zIndex: -1,
