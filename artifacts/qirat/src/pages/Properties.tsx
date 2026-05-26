@@ -3,7 +3,7 @@ import { Link, useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, BedDouble, Bath, Maximize2, ArrowLeft, ArrowRight,
-  Search, SlidersHorizontal, ChevronDown, X, Star,
+  Search, SlidersHorizontal, ChevronDown, X, Star, Phone,
 } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties, Property } from "../data/properties";
@@ -203,16 +203,29 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
             <span className="text-qirat-navy text-xl font-black">{prop.price}</span>
             <span className="text-qirat-navy/50 text-xs mr-1">{t("ج.م", "EGP")}</span>
           </div>
-          <Link href={`/properties/${prop.id}`}>
-            <motion.button
-              className="flex items-center gap-2 btn-gold px-5 py-2.5 rounded-xl text-sm font-bold"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {t("التفاصيل", "Details")}
-              {lang === "ar" ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-            </motion.button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <a href="tel:+201281378331">
+              <motion.button
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                style={{ background: "linear-gradient(135deg, #1B3A6B, #0F2347)", border: "1px solid rgba(201,168,76,0.3)" }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Phone className="w-4 h-4 text-qirat-gold" />
+                {t("اتصل الآن", "Call Now")}
+              </motion.button>
+            </a>
+            <Link href={`/properties/${prop.id}`}>
+              <motion.button
+                className="flex items-center gap-2 btn-gold px-5 py-2.5 rounded-xl text-sm font-bold"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {t("التفاصيل", "Details")}
+                {lang === "ar" ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              </motion.button>
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>

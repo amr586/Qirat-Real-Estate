@@ -498,15 +498,22 @@ export default function PropertyDetail() {
                     boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.12)",
                   }}
                 >
-                  <div className="rounded-full overflow-hidden" style={{ width: 254, height: 254 }}>
+                  <a
+                    href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? property.locationAr : property.locationEn)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block rounded-full overflow-hidden"
+                    style={{ width: 254, height: 254 }}
+                    title={lang === "ar" ? "افتح في خرائط جوجل" : "Open in Google Maps"}
+                  >
                     <iframe
                       src="https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik"
                       width="254" height="254"
-                      style={{ border: 0, display: "block" }}
+                      style={{ border: 0, display: "block", pointerEvents: "none" }}
                       title={lang === "ar" ? property.locationAr : property.locationEn}
                       loading="lazy"
                     />
-                  </div>
+                  </a>
                 </div>
                 <motion.div
                   className="absolute -bottom-3 left-1/2 -translate-x-1/2"
