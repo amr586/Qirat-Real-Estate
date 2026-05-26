@@ -20,9 +20,9 @@ export default function LoadingScreen({ isLoading }: LoadingScreenProps) {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.img
-              src="/qirat-logo.jpg"
+              src="/qirat-logo-new.jpg"
               alt="قيراط"
-              className="w-48 h-auto object-contain rounded-xl"
+              className="w-64 h-auto object-contain"
               animate={{ filter: ["brightness(0.8)", "brightness(1.2)", "brightness(1)"] }}
               transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
             />
