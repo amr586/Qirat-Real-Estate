@@ -99,15 +99,6 @@ export default function Home() {
         </motion.div>
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-          <motion.img
-            src="/qirat-logo.jpg"
-            alt="قيراط"
-            className="h-28 w-auto object-contain rounded-xl mb-8 float-animation"
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          />
-
           <div className="h-24 md:h-32 flex items-center justify-center overflow-hidden mb-4">
             <AnimatePresence mode="wait">
               <motion.h1
