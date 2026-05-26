@@ -126,7 +126,7 @@ export default function Navbar() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
             >
-              <img src="/qirat-logo.jpg" alt="قيراط" className="h-20 w-auto rounded-xl mb-4" />
+              <img src="/qirat-logo-transparent.png" alt="قيراط" className="h-20 w-auto object-contain mb-4" />
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
