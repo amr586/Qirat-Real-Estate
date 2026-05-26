@@ -20,7 +20,7 @@ export default function LoadingScreen({ isLoading }: LoadingScreenProps) {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.img
-              src="/qirat-logo-new.jpg"
+              src="/qirat-logo-nobg.png"
               alt="قيراط"
               className="w-64 h-auto object-contain"
               animate={{ filter: ["brightness(0.8)", "brightness(1.2)", "brightness(1)"] }}

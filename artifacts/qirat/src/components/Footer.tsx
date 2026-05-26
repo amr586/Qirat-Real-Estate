@@ -17,7 +17,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="mb-5">
               <img
-                src="/qirat-logo-new.jpg"
+                src="/qirat-logo-nobg.png"
                 alt="قيراط"
                 className="h-16 w-auto object-contain"
               />
