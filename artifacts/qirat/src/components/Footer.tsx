@@ -83,7 +83,11 @@ export default function Footer() {
                 { ar: "التقييم العقاري", en: "Property Valuation" },
               ].map((item, i) => (
                 <li key={i}>
-                  <span className="text-white/65 text-sm">{t(item.ar, item.en)}</span>
+                  <Link href="/services">
+                    <span className="text-white/65 hover:text-qirat-gold transition-colors text-sm cursor-pointer">
+                      {t(item.ar, item.en)}
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
