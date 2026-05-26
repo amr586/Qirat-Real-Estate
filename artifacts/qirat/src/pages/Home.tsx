@@ -81,38 +81,37 @@ export default function Home() {
       {/* Hero */}
       <div ref={heroRef} className="relative h-screen min-h-[680px] overflow-hidden">
         <motion.div className="absolute inset-0" style={{ y: videoY }}>
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover scale-110"
-            style={{ zIndex: 0 }}
-          >
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-luxury-home-entrance-with-a-beautiful-pool-49665-large.mp4"
-              type="video/mp4"
-            />
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-residential-area-4026-large.mp4"
-              type="video/mp4"
-            />
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-tour-of-a-luxury-apartment-49671-large.mp4"
-              type="video/mp4"
-            />
-          </video>
-          {/* Fallback image if video fails */}
+          {/* Fallback background image */}
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: "url(https://images.unsplash.com/photo-1572977446469-1e2b66734cdf?w=1920&q=80)",
+              backgroundImage: "url(https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&q=80)",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              zIndex: -1,
+              zIndex: 0,
             }}
           />
-          <div className="video-overlay absolute inset-0" style={{ zIndex: 1 }} />
+          {/* YouTube background video */}
+          <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 1 }}>
+            <iframe
+              src="https://www.youtube.com/embed/LKnqECcg6Gw?autoplay=1&mute=1&loop=1&controls=0&disablekb=1&playlist=LKnqECcg6Gw&modestbranding=1&showinfo=0&rel=0&playsinline=1&iv_load_policy=3&fs=0"
+              allow="autoplay; encrypted-media"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "177.78vh",
+                minWidth: "100%",
+                height: "56.25vw",
+                minHeight: "100%",
+                border: "none",
+                pointerEvents: "none",
+              }}
+              title="background video"
+            />
+          </div>
+          <div className="video-overlay absolute inset-0" style={{ zIndex: 2 }} />
         </motion.div>
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
