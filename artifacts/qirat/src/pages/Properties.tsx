@@ -206,12 +206,12 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
           <div className="flex items-center gap-2">
             <a href="tel:+201281378331">
               <motion.button
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all"
                 style={{ background: "linear-gradient(135deg, #1B3A6B, #0F2347)", border: "1px solid rgba(201,168,76,0.3)" }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <Phone className="w-4 h-4 text-qirat-gold" />
+                <Phone className="w-3.5 h-3.5 text-qirat-gold" />
                 {t("اتصل الآن", "Call Now")}
               </motion.button>
             </a>
