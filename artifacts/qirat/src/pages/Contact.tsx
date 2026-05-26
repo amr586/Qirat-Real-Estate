@@ -364,16 +364,23 @@ export default function Contact() {
                       boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.15)",
                     }}
                   >
-                    <div className="rounded-full overflow-hidden" style={{ width: 282, height: 282 }}>
+                    <a
+                      href="https://www.google.com/maps/search/القاهرة،+مصر"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-full overflow-hidden"
+                      style={{ width: 282, height: 282 }}
+                      title="افتح في خرائط جوجل"
+                    >
                       <iframe
                         src="https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik"
                         width="282"
                         height="282"
-                        style={{ border: 0, display: "block" }}
+                        style={{ border: 0, display: "block", pointerEvents: "none" }}
                         title="Qirat Location"
                         loading="lazy"
                       />
-                    </div>
+                    </a>
                   </div>
                   {/* Floating location label */}
                   <motion.div
