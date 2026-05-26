@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
+import HomeSearch from "../components/HomeSearch";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -79,7 +80,7 @@ export default function Home() {
   return (
     <div dir={dir} className="overflow-x-hidden">
       {/* Hero */}
-      <div ref={heroRef} className="relative h-screen min-h-[680px] overflow-hidden">
+      <div ref={heroRef} className="relative min-h-screen min-h-[820px] overflow-hidden">
         <motion.div className="absolute inset-0" style={{ y: videoY }}>
           {/* Fallback background image */}
           <div
@@ -145,20 +146,11 @@ export default function Home() {
           </motion.p>
 
           <motion.div
-            className="flex flex-wrap gap-4 justify-center"
+            className="flex flex-wrap gap-4 justify-center mb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.7 }}
           >
-            <Link href="/properties">
-              <motion.button
-                className="btn-gold px-8 py-4 rounded-2xl text-base font-bold shadow-xl"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {t("استعرض العقارات", "Browse Properties")}
-              </motion.button>
-            </Link>
             <Link href="/contact">
               <motion.button
                 className="px-8 py-4 rounded-2xl text-base font-bold text-white border-2 border-white/30 hover:border-qirat-gold/70 hover:text-qirat-gold transition-all"
@@ -170,8 +162,12 @@ export default function Home() {
             </Link>
           </motion.div>
 
+          <div className="w-full px-4">
+            <HomeSearch />
+          </div>
+
           <motion.div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2"
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.8, repeat: Infinity }}
           >

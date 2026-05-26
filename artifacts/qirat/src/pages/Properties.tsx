@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link } from "wouter";
+import { useState, useEffect } from "react";
+import { Link, useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, ArrowRight, SlidersHorizontal } from "lucide-react";
+import { MapPin, BedDouble, Bath, Maximize2, ArrowLeft, ArrowRight, SlidersHorizontal, X } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties, Property } from "../data/properties";
 
@@ -12,6 +12,15 @@ const fadeUp = {
     y: 0,
     transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
   }),
+};
+
+const LOCATION_MAP: Record<string, string[]> = {
+  "5th-settlement": ["التجمع الخامس", "5th Settlement", "New Cairo"],
+  "golden-square": ["جولدن سكوير", "Golden Square"],
+  "new-capital": ["العاصمة الإدارية", "New Capital"],
+  "6th-settlement": ["التجمع السادس", "6th Settlement"],
+  "heliopolis": ["مصر الجديدة", "Heliopolis"],
+  "sheikh-zayed": ["الشيخ زايد", "Sheikh Zayed"],
 };
 
 function PropertyCard({ prop, index }: { prop: Property; index: number }) {
@@ -103,11 +112,61 @@ function PropertyCard({ prop, index }: { prop: Property; index: number }) {
   );
 }
 
+function parsePrice(priceStr: string): number {
+  return parseInt(priceStr.replace(/,/g, ""), 10) || 0;
+}
+
 export default function Properties() {
   const { t, lang, dir } = useLang();
-  const [filter, setFilter] = useState<"all" | "sale" | "rent" | "partnership">("all");
+  const searchString = useSearch();
 
-  const filtered = filter === "all" ? properties : properties.filter((p) => p.type === filter);
+  const params = new URLSearchParams(searchString);
+  const urlType = (params.get("type") as "all" | "sale" | "rent" | "partnership") || "all";
+  const urlQ = params.get("q") || "";
+  const urlMinPrice = params.get("minPrice") || "";
+  const urlMaxPrice = params.get("maxPrice") || "";
+  const urlMinArea = params.get("minArea") || "";
+  const urlMaxArea = params.get("maxArea") || "";
+  const urlLocation = params.get("location") || "";
+
+  const [filter, setFilter] = useState<"all" | "sale" | "rent" | "partnership">(urlType);
+
+  useEffect(() => {
+    setFilter(urlType);
+  }, [urlType]);
+
+  const hasActiveFilters = urlQ || urlMinPrice || urlMaxPrice || urlMinArea || urlMaxArea || urlLocation;
+
+  const filtered = properties.filter((p) => {
+    if (filter !== "all" && p.type !== filter) return false;
+
+    if (urlQ) {
+      const q = urlQ.toLowerCase();
+      const matchTitle = p.titleAr.toLowerCase().includes(q) || p.titleEn.toLowerCase().includes(q);
+      const matchLocation = p.locationAr.toLowerCase().includes(q) || p.locationEn.toLowerCase().includes(q);
+      if (!matchTitle && !matchLocation) return false;
+    }
+
+    if (urlMinPrice) {
+      const propPrice = parsePrice(p.price);
+      if (propPrice < parseInt(urlMinPrice, 10)) return false;
+    }
+    if (urlMaxPrice) {
+      const propPrice = parsePrice(p.price);
+      if (propPrice > parseInt(urlMaxPrice, 10)) return false;
+    }
+
+    if (urlMinArea && p.area < parseInt(urlMinArea, 10)) return false;
+    if (urlMaxArea && p.area > parseInt(urlMaxArea, 10)) return false;
+
+    if (urlLocation && urlLocation !== "other") {
+      const keywords = LOCATION_MAP[urlLocation] || [];
+      const loc = (p.locationAr + " " + p.locationEn).toLowerCase();
+      if (!keywords.some((kw) => loc.includes(kw.toLowerCase()))) return false;
+    }
+
+    return true;
+  });
 
   const filters = [
     { key: "all", ar: "الكل", en: "All" },
@@ -115,6 +174,10 @@ export default function Properties() {
     { key: "rent", ar: "للإيجار", en: "For Rent" },
     { key: "partnership", ar: "شراكة", en: "Partnership" },
   ] as const;
+
+  const clearFilters = () => {
+    window.location.href = "/properties";
+  };
 
   return (
     <div dir={dir} className="pt-20">
@@ -186,7 +249,53 @@ export default function Properties() {
                 </span>
               </motion.button>
             ))}
+
+            {hasActiveFilters && (
+              <motion.button
+                onClick={clearFilters}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold ml-auto"
+                style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <X className="w-3.5 h-3.5" />
+                {t("مسح الفلاتر", "Clear Filters")}
+              </motion.button>
+            )}
           </div>
+
+          {hasActiveFilters && (
+            <motion.div
+              className="flex flex-wrap gap-2 mt-3"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {urlQ && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
+                  {t("بحث:", "Search:")} {urlQ}
+                </span>
+              )}
+              {urlLocation && urlLocation !== "other" && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
+                  📍 {lang === "ar"
+                    ? (LOCATION_MAP[urlLocation]?.[0] || urlLocation)
+                    : (LOCATION_MAP[urlLocation]?.[1] || urlLocation)}
+                </span>
+              )}
+              {(urlMinPrice || urlMaxPrice) && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
+                  💰 {urlMinPrice ? `${Number(urlMinPrice).toLocaleString()}` : "0"} — {urlMaxPrice ? `${Number(urlMaxPrice).toLocaleString()}` : "∞"} {t("ج.م", "EGP")}
+                </span>
+              )}
+              {(urlMinArea || urlMaxArea) && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-qirat-navy/8 text-qirat-navy border border-qirat-navy/15">
+                  📐 {urlMinArea || "0"} — {urlMaxArea || "∞"} {t("م²", "m²")}
+                </span>
+              )}
+            </motion.div>
+          )}
         </div>
       </div>
 
@@ -195,7 +304,7 @@ export default function Properties() {
         <div className="max-w-7xl mx-auto">
           <motion.p
             className="text-qirat-navy/50 text-sm mb-8"
-            key={filter}
+            key={`${filter}-${searchString}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -211,9 +320,22 @@ export default function Properties() {
           </AnimatePresence>
 
           {filtered.length === 0 && (
-            <div className="text-center py-20 text-qirat-navy/40">
-              {t("لا توجد عقارات مطابقة", "No matching properties")}
-            </div>
+            <motion.div
+              className="text-center py-20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div className="text-5xl mb-4">🔍</div>
+              <p className="text-qirat-navy/40 text-xl mb-4">
+                {t("لا توجد عقارات مطابقة", "No matching properties")}
+              </p>
+              <button
+                onClick={clearFilters}
+                className="btn-gold px-6 py-3 rounded-xl font-bold text-sm"
+              >
+                {t("عرض جميع العقارات", "Show All Properties")}
+              </button>
+            </motion.div>
           )}
         </div>
       </section>
