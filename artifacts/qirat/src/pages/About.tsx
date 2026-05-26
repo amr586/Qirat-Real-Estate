@@ -44,29 +44,6 @@ export default function About() {
     },
   ];
 
-  const team = [
-    {
-      nameAr: "م. أحمد عمر",
-      nameEn: "Eng. Ahmed Omar",
-      roleAr: "المؤسس والرئيس التنفيذي",
-      roleEn: "Founder & CEO",
-      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80",
-    },
-    {
-      nameAr: "م. سارة محمد",
-      nameEn: "Eng. Sara Mohamed",
-      roleAr: "مديرة المبيعات",
-      roleEn: "Sales Director",
-      img: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=80",
-    },
-    {
-      nameAr: "م. كريم علي",
-      nameEn: "Eng. Karim Ali",
-      roleAr: "مستشار عقاري",
-      roleEn: "Real Estate Advisor",
-      img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
-    },
-  ];
 
   return (
     <div dir={dir} className="pt-20">
@@ -256,59 +233,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="py-20 px-4 bg-qirat-cream">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="text-center mb-14"
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <span className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-3 block">
-              {t("فريقنا", "Our Team")}
-            </span>
-            <h2
-              className="text-4xl font-black text-qirat-navy mb-4"
-              style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
-            >
-              {t("الخبراء خلف النجاح", "The Experts Behind Success")}
-            </h2>
-            <div className="section-divider" />
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, i) => (
-              <motion.div
-                key={i}
-                className="bg-white rounded-3xl overflow-hidden shadow-lg property-card text-center"
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-              >
-                <div className="h-64 overflow-hidden">
-                  <img
-                    src={member.img}
-                    alt={lang === "ar" ? member.nameAr : member.nameEn}
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-qirat-navy">
-                    {lang === "ar" ? member.nameAr : member.nameEn}
-                  </h3>
-                  <p className="text-qirat-gold font-semibold text-sm mt-1">
-                    {lang === "ar" ? member.roleAr : member.roleEn}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
