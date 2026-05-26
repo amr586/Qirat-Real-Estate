@@ -6,6 +6,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import AppDownloadBanner from "./components/AppDownloadBanner";
+import FloatingButtons from "./components/FloatingButtons";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -35,6 +36,7 @@ function AppContent() {
       </main>
       <Footer />
       <AppDownloadBanner />
+      <FloatingButtons />
     </div>
   );
 }
