@@ -142,15 +142,6 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
       custom={index}
       layout
     >
-      {featured && (
-        <div
-          className="absolute top-4 right-4 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
-          style={{ background: "rgba(201,168,76,0.95)", color: "white" }}
-        >
-          <Star className="w-3 h-3 fill-white" />
-          {t("مميز", "Featured")}
-        </div>
-      )}
       <div className="relative h-60 overflow-hidden">
         <img
           src={prop.image}
