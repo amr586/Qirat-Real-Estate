@@ -94,10 +94,28 @@ export default function Footer() {
                   {t("القاهرة، جمهورية مصر العربية", "Cairo, Arab Republic of Egypt")}
                 </span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-qirat-gold flex-shrink-0" />
-                <a href="tel:+20100000000" className="text-white/65 hover:text-qirat-gold text-sm transition-colors">
-                  +20 100 000 0000
+              <li>
+                <a href="tel:+20100000000">
+                  <motion.div
+                    className="flex items-center gap-3 rounded-2xl px-4 py-3 mt-1"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.08) 100%)",
+                      border: "1px solid rgba(201,168,76,0.35)",
+                    }}
+                    whileHover={{ scale: 1.03, borderColor: "rgba(201,168,76,0.7)" }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "rgba(201,168,76,0.2)" }}
+                    >
+                      <Phone className="w-4 h-4 text-qirat-gold" />
+                    </div>
+                    <div>
+                      <div className="text-white/40 text-xs">{t("اتصل بنا", "Call Us")}</div>
+                      <div className="text-qirat-gold font-black text-base leading-tight">+20 100 000 0000</div>
+                    </div>
+                  </motion.div>
                 </a>
               </li>
               <li className="flex items-center gap-3">

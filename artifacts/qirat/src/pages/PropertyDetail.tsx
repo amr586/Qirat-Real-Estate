@@ -186,6 +186,75 @@ export default function PropertyDetail() {
                 ))}
               </div>
             </motion.div>
+
+            {/* Circular Location Map */}
+            <motion.div
+              className="bg-white rounded-3xl p-8 shadow-sm flex flex-col items-center"
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+            >
+              <h2 className="text-xl font-bold text-qirat-navy mb-2 self-start">{t("موقع العقار", "Property Location")}</h2>
+              <p className="text-qirat-navy/50 text-sm mb-7 self-start">
+                {lang === "ar" ? property.locationAr : property.locationEn}
+              </p>
+              <div className="relative flex items-center justify-center" style={{ width: 290, height: 290 }}>
+                {/* Pulse rings */}
+                <motion.div
+                  className="absolute rounded-full"
+                  style={{ width: 286, height: 286, border: "2px solid rgba(201,168,76,0.2)" }}
+                  animate={{ scale: [1, 1.07, 1], opacity: [0.5, 0.1, 0.5] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute rounded-full"
+                  style={{ width: 274, height: 274, border: "1.5px solid rgba(201,168,76,0.3)" }}
+                  animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.15, 0.6] }}
+                  transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
+                />
+                {/* Gold ring */}
+                <div
+                  className="rounded-full flex items-center justify-center"
+                  style={{
+                    width: 264,
+                    height: 264,
+                    padding: 5,
+                    background: "linear-gradient(135deg, #C9A84C 0%, #F0D98A 45%, #A8872E 100%)",
+                    boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.12)",
+                  }}
+                >
+                  <div className="rounded-full overflow-hidden" style={{ width: 254, height: 254 }}>
+                    <iframe
+                      src="https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik"
+                      width="254"
+                      height="254"
+                      style={{ border: 0, display: "block" }}
+                      title={lang === "ar" ? property.locationAr : property.locationEn}
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+                {/* Floating location label */}
+                <motion.div
+                  className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity }}
+                >
+                  <div
+                    className="px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap"
+                    style={{
+                      background: "linear-gradient(135deg, #1B3A6B, #0F2347)",
+                      border: "1px solid rgba(201,168,76,0.45)",
+                      boxShadow: "0 4px 14px rgba(27,58,107,0.3)",
+                    }}
+                  >
+                    <MapPin className="w-3 h-3 text-qirat-gold" />
+                    {lang === "ar" ? property.locationAr : property.locationEn}
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Contact form */}

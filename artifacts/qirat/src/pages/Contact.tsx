@@ -325,68 +325,123 @@ export default function Contact() {
               </form>
             </motion.div>
 
-            {/* Right side - Info */}
+            {/* Right side - Map + Info */}
             <motion.div
-              className="space-y-6 flex flex-col justify-center"
+              className="space-y-6 flex flex-col"
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               custom={1}
             >
-              <div
-                className="rounded-3xl p-8 h-64 overflow-hidden relative"
-                style={{ background: "linear-gradient(135deg, #1B3A6B 0%, #0F2347 100%)" }}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=70"
-                  alt="Cairo"
-                  className="absolute inset-0 w-full h-full object-cover opacity-20"
-                />
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <h3 className="text-2xl font-black text-white mb-3">
-                      {t("مكتبنا الرئيسي", "Our Main Office")}
-                    </h3>
-                    <p className="text-white/70 text-sm leading-relaxed">
-                      {t(
-                        "القاهرة، جمهورية مصر العربية\nنرحب بزيارتك خلال ساعات العمل",
-                        "Cairo, Arab Republic of Egypt\nWe welcome your visit during working hours"
-                      )}
-                    </p>
+              {/* Circular map with golden ring */}
+              <div className="flex flex-col items-center">
+                <h3 className="text-xl font-black text-qirat-navy mb-6 text-center">
+                  {t("موقعنا على الخريطة", "Our Location on Map")}
+                </h3>
+                <div className="relative flex items-center justify-center" style={{ width: 320, height: 320 }}>
+                  {/* Pulse rings */}
+                  <motion.div
+                    className="absolute rounded-full"
+                    style={{ width: 316, height: 316, border: "2px solid rgba(201,168,76,0.2)" }}
+                    animate={{ scale: [1, 1.07, 1], opacity: [0.5, 0.1, 0.5] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="absolute rounded-full"
+                    style={{ width: 304, height: 304, border: "1.5px solid rgba(201,168,76,0.3)" }}
+                    animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.15, 0.6] }}
+                    transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
+                  />
+                  {/* Gold ring */}
+                  <div
+                    className="rounded-full flex items-center justify-center"
+                    style={{
+                      width: 292,
+                      height: 292,
+                      padding: 5,
+                      background: "linear-gradient(135deg, #C9A84C 0%, #F0D98A 45%, #A8872E 100%)",
+                      boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.15)",
+                    }}
+                  >
+                    <div className="rounded-full overflow-hidden" style={{ width: 282, height: 282 }}>
+                      <iframe
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik"
+                        width="282"
+                        height="282"
+                        style={{ border: 0, display: "block" }}
+                        title="Qirat Location"
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-green-400" />
-                    <span className="text-white/70 text-sm">
-                      {t("مفتوح الآن", "Open Now")}
-                    </span>
-                  </div>
+                  {/* Floating location label */}
+                  <motion.div
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2"
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 2.2, repeat: Infinity }}
+                  >
+                    <div
+                      className="px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap"
+                      style={{
+                        background: "linear-gradient(135deg, #1B3A6B, #0F2347)",
+                        border: "1px solid rgba(201,168,76,0.45)",
+                        boxShadow: "0 4px 14px rgba(27,58,107,0.35)",
+                      }}
+                    >
+                      <MapPin className="w-3 h-3 text-qirat-gold" />
+                      {t("القاهرة، جمهورية مصر العربية", "Cairo, Egypt")}
+                    </div>
+                  </motion.div>
                 </div>
               </div>
 
+              {/* Phone CTA */}
               <div
-                className="rounded-3xl p-8"
+                className="rounded-3xl p-7"
                 style={{ background: "linear-gradient(135deg, #C9A84C 0%, #A8872E 100%)" }}
               >
-                <h3 className="text-2xl font-black text-white mb-3">
-                  {t("استشارة مجانية", "Free Consultation")}
+                <h3 className="text-xl font-black text-white mb-2">
+                  {t("اتصل بنا مباشرة", "Call Us Directly")}
                 </h3>
-                <p className="text-white/85 text-sm mb-5 leading-relaxed">
-                  {t(
-                    "احجز جلسة استشارية مجانية مع أحد خبرائنا العقاريين المتخصصين وابدأ رحلتك نحو العقار المثالي",
-                    "Book a free consultation session with one of our specialized real estate experts and start your journey toward the perfect property"
-                  )}
+                <p className="text-white/85 text-sm mb-4">
+                  {t("فريقنا متاح السبت – الخميس من 9ص حتى 6م", "Our team is available Sat–Thu, 9AM–6PM")}
                 </p>
                 <a href="tel:+20100000000">
-                  <motion.button
-                    className="bg-white text-qirat-navy font-bold px-6 py-3 rounded-xl flex items-center gap-2 text-sm hover:bg-white/90 transition-colors"
+                  <motion.div
+                    className="bg-white rounded-2xl px-5 py-3 flex items-center gap-3 w-fit cursor-pointer"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <Phone className="w-4 h-4" />
-                    {t("اتصل الآن", "Call Now")}
-                  </motion.button>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(201,168,76,0.15)" }}>
+                      <Phone className="w-5 h-5 text-qirat-gold" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-qirat-navy/50 font-medium">{t("اتصل الآن", "Call Now")}</div>
+                      <div className="text-qirat-navy font-black text-base">+20 100 000 0000</div>
+                    </div>
+                  </motion.div>
                 </a>
+              </div>
+
+              {/* Free consultation */}
+              <div
+                className="rounded-3xl p-7"
+                style={{ background: "linear-gradient(135deg, #1B3A6B 0%, #0F2347 100%)", border: "1px solid rgba(201,168,76,0.2)" }}
+              >
+                <h3 className="text-xl font-black text-white mb-2">
+                  {t("استشارة مجانية", "Free Consultation")}
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed">
+                  {t(
+                    "احجز جلستك مع خبير عقاري متخصص — بدون أي التزام",
+                    "Book your session with a real estate specialist — no commitment"
+                  )}
+                </p>
+                <div className="flex items-center gap-2 mt-3">
+                  <div className="w-2 h-2 rounded-full bg-green-400" />
+                  <span className="text-white/60 text-sm">{t("متاح الآن", "Available Now")}</span>
+                </div>
               </div>
             </motion.div>
           </div>
