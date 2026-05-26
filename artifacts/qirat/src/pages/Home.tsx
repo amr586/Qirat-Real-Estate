@@ -90,15 +90,15 @@ export default function Home() {
             style={{ zIndex: 0 }}
           >
             <source
-              src="https://videos.pexels.com/video-files/3255536/3255536-hd_1280_720_24fps.mp4"
-              type="video/mp4"
-            />
-            <source
-              src="https://videos.pexels.com/video-files/3048888/3048888-hd_1280_720_24fps.mp4"
+              src="https://assets.mixkit.co/videos/preview/mixkit-luxury-home-entrance-with-a-beautiful-pool-49665-large.mp4"
               type="video/mp4"
             />
             <source
               src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-residential-area-4026-large.mp4"
+              type="video/mp4"
+            />
+            <source
+              src="https://assets.mixkit.co/videos/preview/mixkit-tour-of-a-luxury-apartment-49671-large.mp4"
               type="video/mp4"
             />
           </video>
