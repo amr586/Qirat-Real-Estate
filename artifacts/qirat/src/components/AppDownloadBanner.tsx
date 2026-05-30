@@ -59,17 +59,14 @@ export default function AppDownloadBanner() {
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
                   <motion.div
-                    className="flex-shrink-0 w-11 h-11 rounded-xl overflow-hidden"
+                    className="flex-shrink-0 w-20 h-10 flex items-center justify-center"
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ duration: 2.5, repeat: Infinity }}
                   >
                     <img
-                      src="/qirat-logo.jpg"
+                      src="/qirat-logo-gold.png"
                       alt="قيراط"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
+                      className="w-full h-full object-contain"
                     />
                   </motion.div>
                   <div>
