@@ -50,21 +50,6 @@ export default function Services() {
       color: "#C9A84C",
     },
     {
-      Icon: Handshake,
-      ar: "الشراكات العقارية",
-      en: "Real Estate Partnerships",
-      descAr:
-        "نقدم فرصاً مميزة للشراكة في المشاريع العقارية المتنوعة بعوائد استثمارية مضمونة ومجدية. سواء كنت مستثمراً صغيراً أو كبيراً، لدينا الفرصة المناسبة لك.",
-      descEn:
-        "We offer unique partnership opportunities in various real estate projects with guaranteed and profitable investment returns. Whether you're a small or large investor, we have the right opportunity for you.",
-      features: [
-        { ar: "عوائد استثمارية مضمونة", en: "Guaranteed investment returns" },
-        { ar: "مشاريع متنوعة", en: "Diverse projects" },
-        { ar: "إدارة احترافية للاستثمار", en: "Professional investment management" },
-      ],
-      color: "#0F2347",
-    },
-    {
       Icon: TrendingUp,
       ar: "الاستثمار العقاري",
       en: "Real Estate Investment",

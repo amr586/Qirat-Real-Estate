@@ -19,7 +19,7 @@ export interface Property {
   compoundEn?: string;
   deliveryDate?: string;
   deliveryDateEn?: string;
-  type: "sale" | "rent" | "partnership";
+  type: "sale" | "rent";
   typeAr: string;
   typeEn: string;
   image: string;
@@ -299,8 +299,8 @@ export const properties: Property[] = [
   },
   {
     id: 5,
-    titleAr: "وحدة تجارية للشراكة بمدينة نصر",
-    titleEn: "Commercial Unit Partnership in Nasr City",
+    titleAr: "وحدة تجارية مميزة بمدينة نصر",
+    titleEn: "Premium Commercial Unit in Nasr City",
     locationAr: "مدينة نصر، القاهرة",
     locationEn: "Nasr City, Cairo",
     descAr:
@@ -320,9 +320,9 @@ export const properties: Property[] = [
     compoundEn: "Nasr Business Center",
     deliveryDate: "جاهز للتشغيل الفوري",
     deliveryDateEn: "Ready for Immediate Operation",
-    type: "partnership",
-    typeAr: "شراكة",
-    typeEn: "Partnership",
+    type: "sale",
+    typeAr: "للبيع",
+    typeEn: "For Sale",
     investmentReturn: "12% – 18%",
     downPayment: "2,000,000",
     monthlyInstallment: "55,000",

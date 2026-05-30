@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Link } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight, Calendar } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
+import { articles } from "../data/articles";
 import HomeSearch from "../components/HomeSearch";
 
 const BG_VIDEOS = [
@@ -102,7 +103,7 @@ export default function Home() {
   return (
     <div dir={dir} className="overflow-x-hidden">
       {/* Hero */}
-      <div ref={heroRef} className="relative min-h-screen min-h-[820px] overflow-hidden">
+      <div ref={heroRef} className="relative min-h-screen min-h-[820px] overflow-hidden" style={{ background: "#0F2347" }}>
         <motion.div className="absolute inset-0" style={{ y: videoY }}>
           {/* Fallback background image (shows while video loads) */}
           <div
@@ -378,8 +379,85 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* CTA */}
+      {/* Latest Articles */}
       <section className="py-20 px-4 bg-qirat-cream">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            className="text-center mb-14"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <span className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-3 block">
+              {t("مقالات", "Articles")}
+            </span>
+            <h2
+              className="text-4xl md:text-5xl font-black text-qirat-navy mb-4"
+              style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
+            >
+              {t("أحدث المقالات", "Latest Articles")}
+            </h2>
+            <div className="section-divider" />
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {articles.slice(0, 3).map((article, i) => (
+              <motion.div
+                key={article.id}
+                className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer"
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i}
+                whileHover={{ y: -5 }}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={article.image}
+                    alt={lang === "ar" ? article.titleAr : article.titleEn}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span
+                    className="absolute top-4 px-3 py-1 rounded-full text-xs font-bold text-white"
+                    style={{ [lang === "ar" ? "right" : "left"]: "16px", background: "rgba(201,168,76,0.9)" }}
+                  >
+                    {lang === "ar" ? article.categoryAr : article.categoryEn}
+                  </span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-2 text-qirat-navy/40 text-xs mb-2">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{article.date}</span>
+                  </div>
+                  <h3 className="text-base font-black text-qirat-navy mb-2 line-clamp-2 leading-snug">
+                    {lang === "ar" ? article.titleAr : article.titleEn}
+                  </h3>
+                  <p className="text-qirat-navy/55 text-xs leading-relaxed line-clamp-2">
+                    {lang === "ar" ? article.excerptAr : article.excerptEn}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Link href="/blog">
+              <motion.button
+                className="px-8 py-3.5 rounded-2xl font-bold text-qirat-navy border-2 border-qirat-navy/20 hover:border-qirat-gold hover:text-qirat-gold transition-all"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {t("عرض جميع المقالات", "View All Articles")}
+              </motion.button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div
             variants={fadeUp}

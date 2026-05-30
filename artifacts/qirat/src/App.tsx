@@ -13,6 +13,9 @@ import Services from "./pages/Services";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
 import Contact from "./pages/Contact";
+import SellUnit from "./pages/SellUnit";
+import Careers from "./pages/Careers";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +34,9 @@ function AppContent() {
           <Route path="/properties" component={Properties} />
           <Route path="/properties/:id" component={PropertyDetail} />
           <Route path="/contact" component={Contact} />
+          <Route path="/sell" component={SellUnit} />
+          <Route path="/careers" component={Careers} />
+          <Route path="/blog" component={Blog} />
           <Route component={NotFound} />
         </Switch>
       </main>

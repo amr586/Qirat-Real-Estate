@@ -57,6 +57,9 @@ export default function Footer() {
                 { href: "/about", ar: "من نحن", en: "About" },
                 { href: "/services", ar: "خدماتنا", en: "Services" },
                 { href: "/properties", ar: "العقارات", en: "Properties" },
+                { href: "/sell", ar: "بيع وحدتك", en: "Sell Your Unit" },
+                { href: "/blog", ar: "المدونة", en: "Blog" },
+                { href: "/careers", ar: "وظائف", en: "Careers" },
                 { href: "/contact", ar: "تواصل معنا", en: "Contact" },
               ].map((link) => (
                 <li key={link.href}>
@@ -78,7 +81,6 @@ export default function Footer() {
               {[
                 { ar: "بيع العقارات", en: "Property Sales" },
                 { ar: "شراء العقارات", en: "Property Purchase" },
-                { ar: "الشراكات العقارية", en: "Real Estate Partnerships" },
                 { ar: "إيجار العقارات", en: "Property Rental" },
                 { ar: "التقييم العقاري", en: "Property Valuation" },
               ].map((item, i) => (

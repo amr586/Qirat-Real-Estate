@@ -21,6 +21,9 @@ export default function Navbar() {
     { href: "/about", labelAr: "من نحن", labelEn: "About" },
     { href: "/services", labelAr: "خدماتنا", labelEn: "Services" },
     { href: "/properties", labelAr: "العقارات", labelEn: "Properties" },
+    { href: "/sell", labelAr: "بيع وحدتك", labelEn: "Sell" },
+    { href: "/blog", labelAr: "المدونة", labelEn: "Blog" },
+    { href: "/careers", labelAr: "وظائف", labelEn: "Careers" },
     { href: "/contact", labelAr: "تواصل معنا", labelEn: "Contact" },
   ];
 

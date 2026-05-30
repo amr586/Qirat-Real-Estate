@@ -27,7 +27,7 @@ function inferUnitType(p: Property): string {
 }
 
 function inferPurpose(p: Property): string {
-  if (p.bedrooms === 0 || p.type === "partnership") return "commercial";
+  if (p.bedrooms === 0) return "commercial";
   return "residential";
 }
 
@@ -56,7 +56,6 @@ const AD_TYPE_OPTIONS = [
   { key: "", ar: "الكل", en: "All" },
   { key: "sale", ar: "للبيع", en: "For Sale" },
   { key: "rent", ar: "للإيجار", en: "For Rent" },
-  { key: "partnership", ar: "شراكة", en: "Partnership" },
 ];
 
 const STATUS_OPTIONS = [
@@ -129,7 +128,7 @@ function PropertyCard({ prop, index, featured }: { prop: Property; index: number
   const typeColors: Record<string, string> = {
     sale: "#1B3A6B",
     rent: "#C9A84C",
-    partnership: "#0F2347",
+    commercial: "#0F2347",
   };
 
   return (
@@ -243,7 +242,7 @@ export default function Properties() {
   const [unitType, setUnitType] = useState(params.get("unitType") || "");
   const [purpose, setPurpose] = useState(params.get("purpose") || "");
   const [zone, setZone] = useState(params.get("location") || "");
-  const [adType, setAdType] = useState((params.get("type") as "sale" | "rent" | "partnership" | "") || "");
+  const [adType, setAdType] = useState((params.get("type") as "sale" | "rent" | "") || "");
   const [minPrice, setMinPrice] = useState(params.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") || "");
   const [minArea, setMinArea] = useState(params.get("minArea") || "");

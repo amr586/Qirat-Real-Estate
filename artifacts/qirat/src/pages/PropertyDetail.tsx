@@ -24,6 +24,11 @@ export default function PropertyDetail() {
   const { t, lang, dir } = useLang();
   const { id } = useParams<{ id: string }>();
   const property = properties.find((p) => p.id === Number(id));
+  const similarProperties = property
+    ? properties
+        .filter((p) => p.id !== property.id && (p.type === property.type || p.locationAr.split("،")[0] === property.locationAr.split("،")[0]))
+        .slice(0, 3)
+    : [];
 
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -70,7 +75,7 @@ export default function PropertyDetail() {
   const typeColors: Record<string, string> = {
     sale: "#1B3A6B",
     rent: "#C9A84C",
-    partnership: "#0F2347",
+    commercial: "#0F2347",
   };
 
   const gallery = property.gallery?.length ? property.gallery : [property.image];
@@ -625,7 +630,7 @@ export default function PropertyDetail() {
                   </motion.button>
                 </form>
 
-                <div className="mt-6 pt-6 border-t border-white/10 text-center">
+                <div className="mt-5 pt-5 border-t border-white/10 text-center">
                   <p className="text-white/50 text-xs mb-3">{t("أو اتصل بنا مباشرة", "Or call us directly")}</p>
                   <a
                     href="tel:+20100000000"
@@ -640,6 +645,75 @@ export default function PropertyDetail() {
           </div>
         </div>
       </div>
+
+      {/* Similar Properties */}
+      {similarProperties.length > 0 && (
+        <div className="py-16 px-4 bg-qirat-cream">
+          <div className="max-w-7xl mx-auto">
+            <motion.div className="mb-10" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <span className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-2 block">
+                {t("قد يعجبك أيضاً", "You May Also Like")}
+              </span>
+              <h2
+                className="text-3xl font-black text-qirat-navy"
+                style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
+              >
+                {t("عقارات مشابهة", "Similar Properties")}
+              </h2>
+            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {similarProperties.map((prop, i) => (
+                <motion.div
+                  key={prop.id}
+                  className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group"
+                  variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
+                  whileHover={{ y: -5 }}
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={prop.image}
+                      alt={lang === "ar" ? prop.titleAr : prop.titleEn}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <span
+                      className="absolute top-3 px-3 py-1 rounded-full text-xs font-bold text-white"
+                      style={{
+                        [lang === "ar" ? "right" : "left"]: "12px",
+                        background: prop.type === "sale" ? "#1B3A6B" : "#C9A84C",
+                      }}
+                    >
+                      {lang === "ar" ? prop.typeAr : prop.typeEn}
+                    </span>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-black text-qirat-navy mb-1 text-base line-clamp-1">
+                      {lang === "ar" ? prop.titleAr : prop.titleEn}
+                    </h3>
+                    <p className="text-qirat-gold text-sm font-semibold mb-3 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {lang === "ar" ? prop.locationAr : prop.locationEn}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-qirat-navy text-base">
+                        {prop.price} <span className="text-xs font-semibold text-qirat-navy/40">{t("ج.م", "EGP")}</span>
+                      </span>
+                      <Link href={`/properties/${prop.id}`}>
+                        <motion.button
+                          className="text-qirat-gold text-sm font-bold hover:underline flex items-center gap-1"
+                          whileHover={{ x: lang === "ar" ? -3 : 3 }}
+                        >
+                          {t("التفاصيل", "Details")}
+                          {lang === "ar" ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                        </motion.button>
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

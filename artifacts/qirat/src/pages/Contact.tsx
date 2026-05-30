@@ -255,7 +255,6 @@ export default function Contact() {
                     <option value="buy">{t("شراء عقار", "Buy Property")}</option>
                     <option value="sell">{t("بيع عقار", "Sell Property")}</option>
                     <option value="rent">{t("إيجار عقار", "Rent Property")}</option>
-                    <option value="partnership">{t("شراكة عقارية", "Real Estate Partnership")}</option>
                     <option value="other">{t("استفسار عام", "General Inquiry")}</option>
                   </select>
                 </div>

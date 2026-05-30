@@ -37,12 +37,15 @@ A bilingual (Arabic/English) real estate portfolio website for the Qirat mobile 
 
 ## Product
 
-- Home page: animated "قيراط" word cycle with shimmer effect, video/image hero, stats, featured properties
+- Home page: animated "قيراط" word cycle with shimmer effect, video/image hero, stats, featured properties, latest articles section
 - About page: team, mission/vision/values, company story
-- Services: 6 real estate services (buy, sell, rent, partnership, valuation, legal)
-- Properties: 5 Cairo listings with type filter (all/sale/rent/partnership)
-- Property detail: full info + contact form → amrw4634@gmail.com
+- Services: 5 real estate services (buy, sell, rent, valuation, legal) — no partnership
+- Properties: 5 Cairo listings with type filter (all/sale/rent)
+- Property detail: full info + contact form + similar properties section → amrw4634@gmail.com
 - Contact page: full form → amrw4634@gmail.com
+- Sell Unit (/sell): 3-step process + sell form → amrw4634@gmail.com
+- Blog (/blog): 6 Cairo real estate articles grid
+- Careers (/careers): sales consultant application form + CV link → amrw4634@gmail.com
 - App download banner: appears 4s after page load
 - Language toggle: Arabic ↔ English (all text translates)
 
