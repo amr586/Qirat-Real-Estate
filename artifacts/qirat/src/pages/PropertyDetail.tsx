@@ -5,7 +5,7 @@ import {
   MapPin, BedDouble, Bath, Maximize2, CheckCircle2,
   ArrowLeft, ArrowRight, Send, Phone, Building2, Calendar,
   Layers, Star, TrendingUp, CreditCard, Navigation,
-  Home, ChevronLeft, ChevronRight, X, ZoomIn
+  Home, ChevronLeft, ChevronRight, X, ZoomIn, ExternalLink
 } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
@@ -533,22 +533,31 @@ export default function PropertyDetail() {
                 </h2>
                 <div className="space-y-3">
                   {property.nearbyPlaces.map((place, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-qirat-cream rounded-2xl">
+                    <a
+                      key={i}
+                      href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? place.ar : place.en)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-4 bg-qirat-cream rounded-2xl group hover:bg-qirat-gold/10 transition-colors cursor-pointer"
+                    >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-qirat-gold/15 flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-qirat-gold/15 flex items-center justify-center flex-shrink-0 group-hover:bg-qirat-gold/30 transition-colors">
                           <MapPin className="w-4 h-4 text-qirat-gold" />
                         </div>
-                        <span className="text-qirat-navy/80 text-sm font-medium">
+                        <span className="text-qirat-navy/80 text-sm font-medium group-hover:text-qirat-navy transition-colors">
                           {lang === "ar" ? place.ar : place.en}
                         </span>
                       </div>
-                      <span
-                        className="px-3 py-1 rounded-full text-xs font-bold"
-                        style={{ background: "rgba(201,168,76,.15)", color: "#9A7A2E" }}
-                      >
-                        {place.distance}
-                      </span>
-                    </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="px-3 py-1 rounded-full text-xs font-bold"
+                          style={{ background: "rgba(201,168,76,.15)", color: "#9A7A2E" }}
+                        >
+                          {place.distance}
+                        </span>
+                        <ExternalLink className="w-3.5 h-3.5 text-qirat-gold/50 group-hover:text-qirat-gold transition-colors" />
+                      </div>
+                    </a>
                   ))}
                 </div>
               </motion.div>
