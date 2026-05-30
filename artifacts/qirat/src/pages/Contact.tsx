@@ -363,14 +363,8 @@ export default function Contact() {
                       boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.15)",
                     }}
                   >
-                    <a
-                      href="https://www.google.com/maps/search/القاهرة،+مصر"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block rounded-full overflow-hidden"
-                      style={{ width: 282, height: 282 }}
-                      title="افتح في خرائط جوجل"
-                    >
+                    {/* Map + click overlay */}
+                    <div className="relative rounded-full overflow-hidden" style={{ width: 282, height: 282 }}>
                       <iframe
                         src="https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik"
                         width="282"
@@ -379,7 +373,26 @@ export default function Contact() {
                         title="Qirat Location"
                         loading="lazy"
                       />
-                    </a>
+                      {/* Clickable overlay that opens Google Maps */}
+                      <a
+                        href="https://www.google.com/maps/place/Cairo,+Egypt/@30.0444196,31.2357116,12z"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 flex flex-col items-center justify-end pb-5 group"
+                        style={{ background: "linear-gradient(to top, rgba(27,58,107,0.55) 0%, transparent 55%)" }}
+                        title={t("افتح في خرائط جوجل", "Open in Google Maps")}
+                      >
+                        <motion.div
+                          className="flex items-center gap-2 px-4 py-2 rounded-full text-white text-xs font-bold shadow-lg"
+                          style={{ background: "rgba(27,58,107,0.85)", border: "1px solid rgba(201,168,76,0.5)" }}
+                          whileHover={{ scale: 1.06, background: "rgba(201,168,76,0.9)" }}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          <MapPin className="w-3.5 h-3.5 text-qirat-gold group-hover:text-white" />
+                          {t("افتح في جوجل مابس", "Open in Google Maps")}
+                        </motion.div>
+                      </a>
+                    </div>
                   </div>
                   {/* Floating location label */}
                   <motion.div

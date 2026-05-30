@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, User, Phone, MapPin, Building2, Home, FileText, Send } from "lucide-react";
+import { CheckCircle2, User, Phone, MapPin, Building2, Home, FileText, Send, Link } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 
 const fadeUp = {
@@ -46,7 +46,7 @@ const UNIT_TYPES = [
 export default function SellUnit() {
   const { t, lang, dir } = useLang();
   const [form, setForm] = useState({
-    name: "", phone: "", location: "", compound: "", unitType: "", description: "",
+    name: "", phone: "", location: "", mapsLink: "", compound: "", unitType: "", description: "",
   });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
@@ -67,7 +67,7 @@ export default function SellUnit() {
             property_location: form.location,
             property_compound: form.compound,
             property_type: form.unitType,
-            message: `طلب بيع وحدة\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالموقع: ${form.location}\nالكمبوند: ${form.compound}\nنوع الوحدة: ${form.unitType}\nالوصف: ${form.description}`,
+            message: `طلب بيع وحدة\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالموقع: ${form.location}\nرابط جوجل مابس: ${form.mapsLink || "لم يُرفق"}\nالكمبوند: ${form.compound}\nنوع الوحدة: ${form.unitType}\nالوصف: ${form.description}`,
             to_email: "amrw4634@gmail.com",
             reply_to: "amrw4634@gmail.com",
           },
@@ -197,6 +197,40 @@ export default function SellUnit() {
                     style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
                   />
                 </div>
+              </div>
+
+              {/* Google Maps Link */}
+              <div>
+                <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
+                  {t("رابط الموقع على جوجل مابس (اختياري)", "Google Maps Link (Optional)")}
+                </label>
+                <div className="relative">
+                  <Link className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/30"
+                    style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
+                  <input
+                    type="url"
+                    value={form.mapsLink}
+                    onChange={e => setForm({ ...form, mapsLink: e.target.value })}
+                    placeholder={t("https://maps.google.com/...", "https://maps.google.com/...")}
+                    className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+                    style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
+                    dir="ltr"
+                  />
+                </div>
+                <p className="mt-1.5 text-xs text-qirat-navy/40">
+                  {t("افتح جوجل مابس وشارك رابط الموقع للتحقق من العنوان بدقة", "Open Google Maps, drop a pin and share the link for accurate location")}
+                </p>
+                {form.mapsLink && (
+                  <a
+                    href={form.mapsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-qirat-gold hover:underline"
+                  >
+                    <MapPin className="w-3 h-3" />
+                    {t("معاينة الموقع", "Preview Location")}
+                  </a>
+                )}
               </div>
 
               {/* Compound */}
