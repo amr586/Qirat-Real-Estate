@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, Check } from "lucide-react";
 import { useLocation } from "wouter";
 import { useLang } from "../contexts/LanguageContext";
 
@@ -15,56 +16,86 @@ const UNIT_TYPES = [
 
 const BEDROOM_OPTIONS = [
   { ar: "أي عدد", en: "Any", val: "" },
-  { ar: "1 غرفة", en: "1 Bed", val: "1" },
-  { ar: "2 غرفة", en: "2 Beds", val: "2" },
-  { ar: "3 غرف", en: "3 Beds", val: "3" },
-  { ar: "4 غرف", en: "4 Beds", val: "4" },
-  { ar: "5+ غرف", en: "5+ Beds", val: "5" },
+  { ar: "1", en: "1", val: "1" },
+  { ar: "2", en: "2", val: "2" },
+  { ar: "3", en: "3", val: "3" },
+  { ar: "4", en: "4", val: "4" },
+  { ar: "5+", en: "5+", val: "5" },
 ];
 
 const PRICE_RANGES = [
   { ar: "أي سعر", en: "Any Price", min: "", max: "" },
-  { ar: "أقل من 2 مليون", en: "Under 2M", min: "", max: "2000000" },
-  { ar: "2 - 5 مليون", en: "2M - 5M", min: "2000000", max: "5000000" },
-  { ar: "5 - 10 مليون", en: "5M - 10M", min: "5000000", max: "10000000" },
-  { ar: "10 - 20 مليون", en: "10M - 20M", min: "10000000", max: "20000000" },
-  { ar: "أكثر من 20 مليون", en: "Over 20M", min: "20000000", max: "" },
+  { ar: "أقل من 2 مليون", en: "Under 2M EGP", min: "", max: "2000000" },
+  { ar: "2 – 5 مليون", en: "2M – 5M EGP", min: "2000000", max: "5000000" },
+  { ar: "5 – 10 مليون", en: "5M – 10M EGP", min: "5000000", max: "10000000" },
+  { ar: "10 – 20 مليون", en: "10M – 20M EGP", min: "10000000", max: "20000000" },
+  { ar: "أكثر من 20 مليون", en: "Over 20M EGP", min: "20000000", max: "" },
 ];
 
 type Tab = "compounds" | "units";
 
-interface DropdownProps {
+interface PortalDropdownProps {
   label: string;
   value: string;
   options: { label: string; val: string }[];
   onChange: (val: string) => void;
 }
 
-function FilterDropdown({ label, value, options, onChange }: DropdownProps) {
+function PortalDropdown({ label, value, options, onChange }: PortalDropdownProps) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
   const selected = options.find((o) => o.val === value);
+
+  const calcPos = useCallback(() => {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setPos({ top: r.bottom + 6, left: r.left, width: Math.max(r.width, 180) });
+  }, []);
+
+  const handleOpen = () => {
+    calcPos();
+    setOpen((v) => !v);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onScroll = () => { calcPos(); };
+    const onResize = () => { calcPos(); };
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open, calcPos]);
 
   return (
     <div className="relative">
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={handleOpen}
         className="flex items-center gap-1.5 text-sm font-semibold transition-colors whitespace-nowrap"
         style={{ color: value ? "#1B3A6B" : "#1B3A6B80" }}
       >
         <span>{value ? selected?.label : label}</span>
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className="w-3.5 h-3.5 transition-transform"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        />
       </button>
-      <AnimatePresence>
-        {open && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+
+      {open && createPortal(
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
+          <AnimatePresence>
             <motion.div
-              className="absolute top-8 z-20 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden min-w-[160px]"
-              style={{ [document.dir === "rtl" ? "right" : "left"]: 0 }}
-              initial={{ opacity: 0, y: -8, scale: 0.97 }}
+              className="fixed z-[9999] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+              style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
+              initial={{ opacity: 0, y: -6, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.97 }}
+              exit={{ opacity: 0, y: -6, scale: 0.97 }}
               transition={{ duration: 0.15 }}
             >
               {options.map((opt) => (
@@ -72,16 +103,21 @@ function FilterDropdown({ label, value, options, onChange }: DropdownProps) {
                   key={opt.val}
                   type="button"
                   onClick={() => { onChange(opt.val); setOpen(false); }}
-                  className="w-full text-start px-4 py-2.5 text-sm hover:bg-qirat-cream transition-colors"
-                  style={{ color: opt.val === value ? "#1B3A6B" : "#1B3A6B99", fontWeight: opt.val === value ? "700" : "500" }}
+                  className="w-full text-start px-4 py-2.5 text-sm hover:bg-qirat-cream transition-colors flex items-center justify-between gap-3"
+                  style={{
+                    color: opt.val === value ? "#1B3A6B" : "#1B3A6B99",
+                    fontWeight: opt.val === value ? "700" : "500",
+                  }}
                 >
-                  {opt.label}
+                  <span>{opt.label}</span>
+                  {opt.val === value && <Check className="w-3.5 h-3.5 text-qirat-gold flex-shrink-0" />}
                 </button>
               ))}
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </AnimatePresence>
+        </>,
+        document.body
+      )}
     </div>
   );
 }
@@ -121,7 +157,7 @@ export default function HomeSearch() {
       transition={{ delay: 1, duration: 0.7 }}
     >
       <div
-        className="rounded-3xl overflow-hidden shadow-2xl"
+        className="rounded-3xl shadow-2xl"
         style={{
           background: "rgba(255,255,255,0.97)",
           backdropFilter: "blur(20px)",
@@ -187,15 +223,31 @@ export default function HomeSearch() {
           </div>
         </div>
 
-        {/* Secondary filters */}
+        {/* Filters row */}
         <div
-          className="px-5 py-3.5 flex items-center gap-6 flex-wrap"
+          className="px-5 py-3.5 flex items-center gap-5 flex-wrap"
           style={{ borderTop: "1px solid rgba(201,168,76,0.12)", marginTop: "12px" }}
         >
+          {/* Price range */}
+          <PortalDropdown
+            label={t("أي سعر", "Any Price")}
+            value={`${priceRange.min}-${priceRange.max}`}
+            options={PRICE_RANGES.map((p) => ({ label: t(p.ar, p.en), val: `${p.min}-${p.max}` }))}
+            onChange={(val) => {
+              const idx = val.indexOf("-");
+              const min = val.slice(0, idx);
+              const max = val.slice(idx + 1);
+              setPriceRange({ min, max });
+            }}
+          />
+
           {tab === "units" && (
             <>
-              <FilterDropdown
-                label={t("أنواع الوحدات", "Unit Types")}
+              <div className="w-px h-4 bg-gray-200 flex-shrink-0" />
+
+              {/* Unit type */}
+              <PortalDropdown
+                label={t("نوع الوحدة", "Unit Type")}
                 value={unitType}
                 options={[
                   { label: t("كل الأنواع", "All Types"), val: "" },
@@ -203,25 +255,43 @@ export default function HomeSearch() {
                 ]}
                 onChange={setUnitType}
               />
+
               <div className="w-px h-4 bg-gray-200 flex-shrink-0" />
-              <FilterDropdown
-                label={t("غرف نوم", "Bedrooms")}
-                value={bedrooms}
-                options={BEDROOM_OPTIONS.map((b) => ({ label: t(b.ar, b.en), val: b.val }))}
-                onChange={setBedrooms}
-              />
-              <div className="w-px h-4 bg-gray-200 flex-shrink-0" />
+
+              {/* Bedrooms — pill buttons */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-sm font-semibold text-qirat-navy/50 me-1">
+                  {t("غرف نوم", "Beds")}
+                </span>
+                {BEDROOM_OPTIONS.map((b) => (
+                  <button
+                    key={b.val}
+                    type="button"
+                    onClick={() => setBedrooms(b.val)}
+                    className="w-8 h-8 rounded-full text-xs font-bold transition-all"
+                    style={{
+                      background: bedrooms === b.val ? "#1B3A6B" : "rgba(27,58,107,0.08)",
+                      color: bedrooms === b.val ? "white" : "#1B3A6B",
+                      border: bedrooms === b.val ? "none" : "1px solid rgba(27,58,107,0.15)",
+                    }}
+                  >
+                    {t(b.ar, b.en)}
+                  </button>
+                ))}
+              </div>
             </>
           )}
-          <FilterDropdown
-            label={t("معدل السعر", "Price Range")}
-            value={`${priceRange.min}-${priceRange.max}`}
-            options={PRICE_RANGES.map((p) => ({ label: t(p.ar, p.en), val: `${p.min}-${p.max}` }))}
-            onChange={(val) => {
-              const [min, max] = val.split("-");
-              setPriceRange({ min, max });
-            }}
-          />
+
+          {/* Active indicator */}
+          {(priceRange.min || priceRange.max || unitType || bedrooms) && (
+            <button
+              type="button"
+              onClick={() => { setPriceRange({ min: "", max: "" }); setUnitType(""); setBedrooms(""); }}
+              className="text-xs text-qirat-gold/80 hover:text-qirat-gold font-semibold transition-colors ms-auto"
+            >
+              {t("مسح الكل", "Clear")}
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
