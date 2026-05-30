@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, User, Phone, Mail, Link as LinkIcon, FileText, Send, TrendingUp, Users, Award, Banknote } from "lucide-react";
+import {
+  CheckCircle2, User, Phone, Mail, FileText, Send,
+  TrendingUp, Users, Award, Banknote, Upload, Paperclip, X
+} from "lucide-react";
+import emailjs from "@emailjs/browser";
 import { useLang } from "../contexts/LanguageContext";
 
 const fadeUp = {
@@ -17,34 +21,56 @@ const PERKS = [
 
 export default function Careers() {
   const { t, lang, dir } = useLang();
-  const [form, setForm] = useState({ name: "", phone: "", email: "", cvLink: "", reason: "" });
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [fields, setFields] = useState({ name: "", phone: "", email: "", reason: "" });
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const handleFile = (file: File | null) => {
+    if (!file) return;
+    const allowed = ["application/pdf", "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    if (!allowed.includes(file.type)) {
+      alert(t("يُقبل فقط PDF أو Word", "Only PDF or Word files are accepted"));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert(t("الحد الأقصى للحجم 5 ميجا", "Max file size is 5 MB"));
+      return;
+    }
+    setCvFile(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files[0] ?? null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formRef.current) return;
     setStatus("sending");
     try {
-      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID",
-          template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "YOUR_TEMPLATE_ID",
-          user_id: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY",
-          template_params: {
-            from_name: form.name,
-            from_phone: form.phone,
-            reply_to: form.email,
-            to_email: "amrw4634@gmail.com",
-            message: `طلب توظيف - مستشار مبيعات عقاري\n\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالإيميل: ${form.email}\nرابط السيرة الذاتية: ${form.cvLink}\n\nسبب التقديم:\n${form.reason}`,
-          },
-        }),
-      });
-      if (res.ok) setStatus("success");
-      else setStatus("error");
+      await emailjs.sendForm(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || "YOUR_SERVICE_ID",
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "YOUR_TEMPLATE_ID",
+        formRef.current,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "YOUR_PUBLIC_KEY",
+      );
+      setStatus("success");
     } catch {
       setStatus("error");
     }
+  };
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -146,50 +172,171 @@ export default function Careers() {
               {t("ستصلنا بياناتك وسنرد عليك في أقرب وقت", "We'll receive your application and respond as soon as possible")}
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="p-8 space-y-5">
+
+          <form ref={formRef} onSubmit={handleSubmit} className="p-8 space-y-5">
+            {/* Hidden field for email routing */}
+            <input type="hidden" name="to_email" value="amrw4634@gmail.com" />
+            <input type="hidden" name="subject" value="طلب توظيف - مستشار مبيعات عقاري" />
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {[
-                { key: "name", Icon: User, ar: "الاسم الكامل", en: "Full Name", ph_ar: "اسمك الكامل", ph_en: "Your full name", type: "text" },
-                { key: "phone", Icon: Phone, ar: "رقم الهاتف", en: "Phone Number", ph_ar: "01xxxxxxxxx", ph_en: "01xxxxxxxxx", type: "tel" },
-                { key: "email", Icon: Mail, ar: "البريد الإلكتروني", en: "Email", ph_ar: "بريدك الإلكتروني", ph_en: "Your email", type: "email" },
-                { key: "cvLink", Icon: LinkIcon, ar: "رابط السيرة الذاتية", en: "CV Link", ph_ar: "Google Drive أو Dropbox", ph_en: "Google Drive or Dropbox link", type: "url" },
-              ].map(({ key, Icon, ar, en, ph_ar, ph_en, type }) => (
-                <div key={key}>
-                  <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">{t(ar, en)}</label>
-                  <div className="relative">
-                    <Icon className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/30"
-                      style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
-                    <input
-                      type={type}
-                      required={key !== "cvLink"}
-                      value={form[key as keyof typeof form]}
-                      onChange={e => setForm({ ...form, [key]: e.target.value })}
-                      placeholder={t(ph_ar, ph_en)}
-                      className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
-                      style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
-                    />
-                  </div>
+              {/* Name */}
+              <div>
+                <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
+                  {t("الاسم الكامل", "Full Name")} *
+                </label>
+                <div className="relative">
+                  <User className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/30"
+                    style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
+                  <input
+                    name="from_name"
+                    required
+                    value={fields.name}
+                    onChange={e => setFields({ ...fields, name: e.target.value })}
+                    placeholder={t("اسمك الكامل", "Your full name")}
+                    className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+                    style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
+                  />
                 </div>
-              ))}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
+                  {t("رقم الهاتف", "Phone Number")} *
+                </label>
+                <div className="relative">
+                  <Phone className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/30"
+                    style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
+                  <input
+                    name="from_phone"
+                    required
+                    type="tel"
+                    value={fields.phone}
+                    onChange={e => setFields({ ...fields, phone: e.target.value })}
+                    placeholder="01xxxxxxxxx"
+                    className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+                    style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
+                  />
+                </div>
+              </div>
+
+              {/* Email — spans full width */}
+              <div className="md:col-span-2">
+                <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
+                  {t("البريد الإلكتروني", "Email")} *
+                </label>
+                <div className="relative">
+                  <Mail className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-qirat-navy/30"
+                    style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
+                  <input
+                    name="reply_to"
+                    required
+                    type="email"
+                    value={fields.email}
+                    onChange={e => setFields({ ...fields, email: e.target.value })}
+                    placeholder={t("بريدك الإلكتروني", "Your email")}
+                    className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all"
+                    style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
+                  />
+                </div>
+              </div>
             </div>
 
+            {/* CV Upload */}
             <div>
               <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
-                {t("لماذا تريد الانضمام لقيراط؟", "Why do you want to join Qirat?")}
+                {t("السيرة الذاتية", "CV / Resume")} *
+              </label>
+
+              {/* Hidden actual file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                name="cv_attachment"
+                accept=".pdf,.doc,.docx"
+                required
+                className="hidden"
+                onChange={e => handleFile(e.target.files?.[0] ?? null)}
+              />
+
+              {cvFile ? (
+                /* File selected — show info card */
+                <motion.div
+                  className="flex items-center gap-3 p-4 rounded-2xl border"
+                  style={{ background: "rgba(201,168,76,0.06)", borderColor: "rgba(201,168,76,0.35)" }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: "rgba(201,168,76,0.15)" }}>
+                    <Paperclip className="w-5 h-5 text-qirat-gold" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-qirat-navy font-bold text-sm truncate">{cvFile.name}</p>
+                    <p className="text-qirat-navy/45 text-xs mt-0.5">{formatSize(cvFile.size)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setCvFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                    className="p-1.5 rounded-full hover:bg-red-50 text-qirat-navy/40 hover:text-red-500 transition-colors flex-shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              ) : (
+                /* Drop zone */
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all select-none"
+                  style={{
+                    borderColor: dragOver ? "#C9A84C" : "rgba(27,58,107,0.15)",
+                    background: dragOver ? "rgba(201,168,76,0.05)" : "rgba(27,58,107,0.02)",
+                  }}
+                >
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                    style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)" }}>
+                    <Upload className="w-6 h-6 text-qirat-gold" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-qirat-navy font-bold text-sm">
+                      {t("اسحب الملف هنا أو اضغط للرفع", "Drag & drop or click to upload")}
+                    </p>
+                    <p className="text-qirat-navy/45 text-xs mt-1">
+                      {t("PDF أو Word — الحد الأقصى 5 ميجا", "PDF or Word — max 5 MB")}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reason */}
+            <div>
+              <label className="block text-qirat-navy/60 text-xs font-bold uppercase tracking-wider mb-2">
+                {t("لماذا تريد الانضمام لقيراط؟", "Why do you want to join Qirat?")} *
               </label>
               <div className="relative">
                 <FileText className="absolute top-3.5 w-4 h-4 text-qirat-navy/30"
                   style={{ [lang === "ar" ? "right" : "left"]: "14px" }} />
                 <textarea
-                  required value={form.reason} onChange={e => setForm({ ...form, reason: e.target.value })}
+                  name="message"
+                  required
+                  value={fields.reason}
+                  onChange={e => setFields({ ...fields, reason: e.target.value })}
                   rows={4}
-                  placeholder={t("اكتب عن نفسك وخبراتك وسبب اختيارك للعمل معنا...", "Write about yourself, your experience, and why you chose to work with us...")}
+                  placeholder={t(
+                    "اكتب عن نفسك وخبراتك وسبب اختيارك للعمل معنا...",
+                    "Write about yourself, your experience, and why you chose to work with us..."
+                  )}
                   className="w-full py-3 rounded-xl border border-gray-200 text-qirat-navy text-sm focus:outline-none focus:border-qirat-gold/60 focus:ring-2 focus:ring-qirat-gold/10 transition-all resize-none"
                   style={{ [lang === "ar" ? "paddingRight" : "paddingLeft"]: "40px", [lang === "ar" ? "paddingLeft" : "paddingRight"]: "16px" }}
                 />
               </div>
             </div>
 
+            {/* Status messages */}
             {status === "success" && (
               <motion.div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 text-green-700 text-sm"
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -205,9 +352,11 @@ export default function Careers() {
             )}
 
             <motion.button
-              type="submit" disabled={status === "sending" || status === "success"}
+              type="submit"
+              disabled={status === "sending" || status === "success"}
               className="w-full btn-gold py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 disabled:opacity-70"
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            >
               {status === "sending" ? (
                 <motion.div className="w-5 h-5 border-2 border-qirat-navy/30 border-t-qirat-navy rounded-full"
                   animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} />
