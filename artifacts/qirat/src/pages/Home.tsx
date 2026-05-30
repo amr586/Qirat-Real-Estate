@@ -6,6 +6,7 @@ import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
 import { articles } from "../data/articles";
 import HomeSearch from "../components/HomeSearch";
+import AdsBanner from "../components/AdsBanner";
 
 const AREAS = [
   {
@@ -259,6 +260,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+      {/* Ads Banner */}
+      <AdsBanner />
       {/* Top Areas */}
       <section className="py-20 px-4 bg-qirat-cream">
         <div className="max-w-7xl mx-auto">
