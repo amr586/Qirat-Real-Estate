@@ -225,9 +225,9 @@ export const properties: Property[] = [
     ],
     nearbyPlaces: [
       { ar: "مسجد النور", en: "Al Nour Mosque", distance: "300م" },
-      { ar: "كارفور مصر الجديدة", en: "Carrefour Heliopolis", distance: "1كم" },
+      { ar: "كارفور هليوبوليس", en: "Carrefour Heliopolis", distance: "1.2كم" },
       { ar: "مطار القاهرة الدولي", en: "Cairo International Airport", distance: "6كم" },
-      { ar: "مستشفى المعادي العام", en: "Maadi General Hospital", distance: "4كم" },
+      { ar: "مستشفى هليوبوليس", en: "Heliopolis Hospital", distance: "900م" },
     ],
     paymentOptions: [
       { ar: "دفع كامل بخصم 10%", en: "Full payment with 10% discount" },
@@ -285,10 +285,10 @@ export const properties: Property[] = [
       { ar: "دش سخن مركزي", en: "Central Water Heater" },
     ],
     nearbyPlaces: [
-      { ar: "سوبر ماركت سيفوي", en: "Seoudi Supermarket", distance: "200م" },
-      { ar: "محطة مترو الجيزة", en: "Giza Metro Station", distance: "1.5كم" },
-      { ar: "مستشفى الهلال", en: "Al Hilal Hospital", distance: "700م" },
-      { ar: "شارع جامعة الدول", en: "Arab League Street", distance: "400م" },
+      { ar: "نادي الصيد", en: "Shooting Club", distance: "500م" },
+      { ar: "شارع جامعة الدول العربية", en: "Arab League Street", distance: "400م" },
+      { ar: "محطة مترو بولاق الدكرور", en: "Bulaq El Dakrour Metro", distance: "1.2كم" },
+      { ar: "مستشفى أندلسية المهندسين", en: "Andalusia Mohandessin Hospital", distance: "600م" },
     ],
     paymentOptions: [
       { ar: "إيجار شهري 35,000 ج.م", en: "Monthly rent 35,000 EGP" },
