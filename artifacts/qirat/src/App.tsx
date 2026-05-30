@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import SellUnit from "./pages/SellUnit";
 import Careers from "./pages/Careers";
 import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/sell" component={SellUnit} />
           <Route path="/careers" component={Careers} />
           <Route path="/blog" component={Blog} />
+          <Route path="/blog/:id" component={BlogDetail} />
           <Route component={NotFound} />
         </Switch>
       </main>

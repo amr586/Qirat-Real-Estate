@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { useLang } from "../contexts/LanguageContext";
 import { articles } from "../data/articles";
-import { Calendar, Tag } from "lucide-react";
+import { Calendar, Clock, ChevronRight } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -36,39 +37,52 @@ export default function Blog() {
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article, i) => (
-            <motion.article
+            <motion.div
               key={article.id}
-              className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer hover:shadow-md transition-shadow"
               variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -5 }}
             >
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={article.image}
-                  alt={lang === "ar" ? article.titleAr : article.titleEn}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                <span
-                  className="absolute top-4 px-3 py-1 rounded-full text-xs font-bold text-white"
-                  style={{ [lang === "ar" ? "right" : "left"]: "16px", background: "rgba(201,168,76,0.9)" }}
-                >
-                  {lang === "ar" ? article.categoryAr : article.categoryEn}
-                </span>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 text-qirat-navy/40 text-xs mb-3">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{article.date}</span>
-                </div>
-                <h2 className="text-lg font-black text-qirat-navy mb-2 line-clamp-2 leading-snug">
-                  {lang === "ar" ? article.titleAr : article.titleEn}
-                </h2>
-                <p className="text-qirat-navy/60 text-sm leading-relaxed line-clamp-3">
-                  {lang === "ar" ? article.excerptAr : article.excerptEn}
-                </p>
-              </div>
-            </motion.article>
+              <Link href={`/blog/${article.id}`}>
+                <article className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer hover:shadow-lg transition-shadow h-full flex flex-col">
+                  <div className="relative h-52 overflow-hidden flex-shrink-0">
+                    <img
+                      src={article.image}
+                      alt={lang === "ar" ? article.titleAr : article.titleEn}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+                    <span
+                      className="absolute top-4 px-3 py-1 rounded-full text-xs font-bold text-white"
+                      style={{ [lang === "ar" ? "right" : "left"]: "16px", background: "rgba(201,168,76,0.92)" }}
+                    >
+                      {lang === "ar" ? article.categoryAr : article.categoryEn}
+                    </span>
+                  </div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center gap-3 text-qirat-navy/40 text-xs mb-3">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {article.date}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {lang === "ar" ? article.readTimeAr : article.readTimeEn}
+                      </span>
+                    </div>
+                    <h2 className="text-lg font-black text-qirat-navy mb-2 line-clamp-2 leading-snug">
+                      {lang === "ar" ? article.titleAr : article.titleEn}
+                    </h2>
+                    <p className="text-qirat-navy/60 text-sm leading-relaxed line-clamp-3 flex-1">
+                      {lang === "ar" ? article.excerptAr : article.excerptEn}
+                    </p>
+                    <div className="flex items-center gap-1 mt-4 text-qirat-gold text-sm font-bold">
+                      {t("اقرأ المزيد", "Read more")}
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
