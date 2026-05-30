@@ -238,7 +238,7 @@ export default function Properties() {
   const params = useMemo(() => new URLSearchParams(searchString), [searchString]);
 
   const [searchText, setSearchText] = useState(params.get("q") || "");
-  const [showFilters, setShowFilters] = useState(!!searchString);
+  const [showFilters, setShowFilters] = useState(true);
   const [unitType, setUnitType] = useState(params.get("unitType") || "");
   const [purpose, setPurpose] = useState(params.get("purpose") || "");
   const [zone, setZone] = useState(params.get("location") || "");
@@ -353,11 +353,9 @@ export default function Properties() {
         </div>
       </div>
 
-      {/* Sticky filter bar */}
+      {/* Sticky search bar — compact only, no filter panel here */}
       <div className="sticky top-20 z-20 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-
-          {/* Search row */}
+        <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex gap-3 items-center">
             <div className="relative flex-1">
               <Search
@@ -416,120 +414,60 @@ export default function Properties() {
               </motion.button>
             )}
           </div>
-
-          {/* Expanded filter panel */}
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden"
-              >
-                <div className="pt-4 space-y-4">
-                  {/* Dropdowns row */}
-                  <div className="flex flex-wrap gap-3">
-                    <SelectBox
-                      label={t("نوع الوحدة", "Unit Type")}
-                      value={unitType}
-                      onChange={setUnitType}
-                      options={UNIT_TYPE_OPTIONS}
-                      dir={dir}
-                    />
-                    <SelectBox
-                      label={t("الغرض", "Purpose")}
-                      value={purpose}
-                      onChange={setPurpose}
-                      options={PURPOSE_OPTIONS}
-                      dir={dir}
-                    />
-                    <SelectBox
-                      label={t("المنطقة", "Zone")}
-                      value={zone}
-                      onChange={setZone}
-                      options={zoneOptions}
-                      dir={dir}
-                    />
-                    <SelectBox
-                      label={t("نوع الإعلان", "Ad Type")}
-                      value={adType}
-                      onChange={setAdType}
-                      options={AD_TYPE_OPTIONS}
-                      dir={dir}
-                    />
-                    <SelectBox
-                      label={t("الحالة", "Status")}
-                      value="available"
-                      onChange={() => {}}
-                      options={STATUS_OPTIONS}
-                      dir={dir}
-                    />
-                  </div>
-
-                  {/* Price + Area */}
-                  <div className="flex flex-wrap gap-3">
-                    <PriceInput
-                      label={t("السعر الأدنى (ج)", "Min Price (EGP)")}
-                      value={minPrice}
-                      onChange={setMinPrice}
-                      placeholder={t("0", "0")}
-                    />
-                    <PriceInput
-                      label={t("السعر الأقصى (ج)", "Max Price (EGP)")}
-                      value={maxPrice}
-                      onChange={setMaxPrice}
-                      placeholder={t("غير محدد", "Unlimited")}
-                    />
-                    <PriceInput
-                      label={t("المساحة الأدنى (م²)", "Min Area (m²)")}
-                      value={minArea}
-                      onChange={setMinArea}
-                      placeholder={t("0", "0")}
-                    />
-                    <PriceInput
-                      label={t("المساحة الأقصى (م²)", "Max Area (m²)")}
-                      value={maxArea}
-                      onChange={setMaxArea}
-                      placeholder={t("غير محدد", "Unlimited")}
-                    />
-
-                    {/* Featured checkbox */}
-                    <div className="flex items-end pb-0.5 min-w-[140px]">
-                      <label className="flex items-center gap-2.5 cursor-pointer group">
-                        <div
-                          className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                          style={{
-                            borderColor: featuredOnly ? "#C9A84C" : "#d1d5db",
-                            background: featuredOnly ? "#C9A84C" : "white",
-                          }}
-                          onClick={() => setFeaturedOnly((v) => !v)}
-                        >
-                          {featuredOnly && (
-                            <motion.svg
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className="w-3 h-3 text-white"
-                              viewBox="0 0 12 12"
-                              fill="none"
-                            >
-                              <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </motion.svg>
-                          )}
-                        </div>
-                        <span className="text-qirat-navy text-sm font-semibold flex items-center gap-1.5">
-                          <Star className="w-3.5 h-3.5 text-qirat-gold" />
-                          {t("عقارات مميزة", "Featured Only")}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
+
+      {/* Expandable filter panel — NOT sticky, sits in normal flow so it never overlaps the grid */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden bg-white border-b border-gray-100"
+          >
+            <div className="max-w-7xl mx-auto px-4 py-5 space-y-4">
+              {/* Dropdowns row */}
+              <div className="flex flex-wrap gap-3">
+                <SelectBox label={t("نوع الوحدة", "Unit Type")} value={unitType} onChange={setUnitType} options={UNIT_TYPE_OPTIONS} dir={dir} />
+                <SelectBox label={t("الغرض", "Purpose")} value={purpose} onChange={setPurpose} options={PURPOSE_OPTIONS} dir={dir} />
+                <SelectBox label={t("المنطقة", "Zone")} value={zone} onChange={setZone} options={zoneOptions} dir={dir} />
+                <SelectBox label={t("نوع الإعلان", "Ad Type")} value={adType} onChange={setAdType} options={AD_TYPE_OPTIONS} dir={dir} />
+                <SelectBox label={t("الحالة", "Status")} value="available" onChange={() => {}} options={STATUS_OPTIONS} dir={dir} />
+              </div>
+
+              {/* Price + Area */}
+              <div className="flex flex-wrap gap-3">
+                <PriceInput label={t("السعر الأدنى (ج)", "Min Price (EGP)")} value={minPrice} onChange={setMinPrice} placeholder={t("0", "0")} />
+                <PriceInput label={t("السعر الأقصى (ج)", "Max Price (EGP)")} value={maxPrice} onChange={setMaxPrice} placeholder={t("غير محدد", "Unlimited")} />
+                <PriceInput label={t("المساحة الأدنى (م²)", "Min Area (m²)")} value={minArea} onChange={setMinArea} placeholder={t("0", "0")} />
+                <PriceInput label={t("المساحة الأقصى (م²)", "Max Area (m²)")} value={maxArea} onChange={setMaxArea} placeholder={t("غير محدد", "Unlimited")} />
+
+                <div className="flex items-end pb-0.5 min-w-[140px]">
+                  <label className="flex items-center gap-2.5 cursor-pointer group">
+                    <div
+                      className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                      style={{ borderColor: featuredOnly ? "#C9A84C" : "#d1d5db", background: featuredOnly ? "#C9A84C" : "white" }}
+                      onClick={() => setFeaturedOnly((v) => !v)}
+                    >
+                      {featuredOnly && (
+                        <motion.svg initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none">
+                          <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </motion.svg>
+                      )}
+                    </div>
+                    <span className="text-qirat-navy text-sm font-semibold flex items-center gap-1.5">
+                      <Star className="w-3.5 h-3.5 text-qirat-gold" />
+                      {t("عقارات مميزة", "Featured Only")}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Grid */}
       <section className="py-12 px-4 bg-qirat-cream min-h-[50vh]">

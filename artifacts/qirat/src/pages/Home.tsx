@@ -1,11 +1,50 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight, Calendar } from "lucide-react";
+import { ChevronDown, Star, Building2, Users, Award, ArrowLeft, ArrowRight, Calendar, MapPin } from "lucide-react";
 import { useLang } from "../contexts/LanguageContext";
 import { properties } from "../data/properties";
 import { articles } from "../data/articles";
 import HomeSearch from "../components/HomeSearch";
+
+const AREAS = [
+  {
+    nameAr: "الزمالك",
+    nameEn: "Zamalek",
+    location: "الزمالك",
+    img: "https://images.unsplash.com/photo-1577495508048-b635879837f1?w=400&q=80",
+  },
+  {
+    nameAr: "التجمع الخامس",
+    nameEn: "5th Settlement",
+    location: "التجمع",
+    img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&q=80",
+  },
+  {
+    nameAr: "مصر الجديدة",
+    nameEn: "Heliopolis",
+    location: "مصر الجديدة",
+    img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&q=80",
+  },
+  {
+    nameAr: "المهندسين",
+    nameEn: "Mohandessin",
+    location: "المهندسين",
+    img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&q=80",
+  },
+  {
+    nameAr: "مدينة نصر",
+    nameEn: "Nasr City",
+    location: "مدينة نصر",
+    img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80",
+  },
+  {
+    nameAr: "العاصمة الإدارية",
+    nameEn: "New Admin Capital",
+    location: "العاصمة الإدارية",
+    img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80",
+  },
+];
 
 const BG_VIDEOS = [
   "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-residential-neighborhood-41890-large.mp4",
@@ -220,8 +259,90 @@ export default function Home() {
           ))}
         </div>
       </section>
-      {/* Featured Properties */}
+      {/* Top Areas */}
       <section className="py-20 px-4 bg-qirat-cream">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            className="flex items-end justify-between mb-12 flex-wrap gap-4"
+            variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
+          >
+            <div>
+              <span className="text-qirat-gold font-semibold text-sm uppercase tracking-widest mb-2 block">
+                {t("استكشف", "Explore")}
+              </span>
+              <h2
+                className="text-4xl md:text-5xl font-black text-qirat-navy"
+                style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
+              >
+                {t("أهم المناطق", "Top Areas")}
+              </h2>
+            </div>
+            <Link href="/properties">
+              <motion.span
+                className="flex items-center gap-1.5 text-qirat-gold font-bold text-sm cursor-pointer hover:underline"
+                whileHover={{ x: lang === "ar" ? -3 : 3 }}
+              >
+                {t("عرض الكل", "View All")}
+                {lang === "ar" ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              </motion.span>
+            </Link>
+          </motion.div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            {AREAS.map((area, i) => {
+              const count = properties.filter(p =>
+                (p.locationAr + " " + p.locationEn).toLowerCase().includes(area.location.toLowerCase())
+              ).length;
+              return (
+                <motion.div
+                  key={i}
+                  variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
+                  whileHover={{ y: -6 }}
+                >
+                  <Link href={`/properties?location=${encodeURIComponent(area.location)}`}>
+                    <div className="flex flex-col items-center cursor-pointer group">
+                      {/* Circle image */}
+                      <div
+                        className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden mb-3 transition-all duration-300"
+                        style={{
+                          boxShadow: "0 4px 20px rgba(27,58,107,0.15)",
+                          border: "3px solid transparent",
+                          background: "linear-gradient(white,white) padding-box, linear-gradient(135deg,#C9A84C,#1B3A6B) border-box",
+                        }}
+                      >
+                        <img
+                          src={area.img}
+                          alt={lang === "ar" ? area.nameAr : area.nameEn}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-qirat-navy/30 to-transparent group-hover:from-qirat-navy/50 transition-colors" />
+                        {count > 0 && (
+                          <div
+                            className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white text-[10px] font-black px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(201,168,76,0.92)" }}
+                          >
+                            {count} {lang === "ar" ? "عقار" : "prop."}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-qirat-navy font-black text-sm text-center group-hover:text-qirat-gold transition-colors leading-tight">
+                        {lang === "ar" ? area.nameAr : area.nameEn}
+                      </p>
+                      <p className="text-qirat-navy/40 text-xs mt-0.5 flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {t("القاهرة", "Cairo")}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Properties */}
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.div
             className="text-center mb-14"
@@ -405,39 +526,42 @@ export default function Home() {
             {articles.slice(0, 3).map((article, i) => (
               <motion.div
                 key={article.id}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer"
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
+                variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
                 whileHover={{ y: -5 }}
               >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={article.image}
-                    alt={lang === "ar" ? article.titleAr : article.titleEn}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span
-                    className="absolute top-4 px-3 py-1 rounded-full text-xs font-bold text-white"
-                    style={{ [lang === "ar" ? "right" : "left"]: "16px", background: "rgba(201,168,76,0.9)" }}
-                  >
-                    {lang === "ar" ? article.categoryAr : article.categoryEn}
-                  </span>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 text-qirat-navy/40 text-xs mb-2">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{article.date}</span>
+                <Link href={`/blog/${article.id}`}>
+                  <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 group cursor-pointer hover:shadow-md transition-shadow h-full flex flex-col">
+                    <div className="relative h-48 overflow-hidden flex-shrink-0">
+                      <img
+                        src={article.image}
+                        alt={lang === "ar" ? article.titleAr : article.titleEn}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <span
+                        className="absolute top-4 px-3 py-1 rounded-full text-xs font-bold text-white"
+                        style={{ [lang === "ar" ? "right" : "left"]: "16px", background: "rgba(201,168,76,0.9)" }}
+                      >
+                        {lang === "ar" ? article.categoryAr : article.categoryEn}
+                      </span>
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex items-center gap-2 text-qirat-navy/40 text-xs mb-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{article.date}</span>
+                      </div>
+                      <h3 className="text-base font-black text-qirat-navy mb-2 line-clamp-2 leading-snug flex-1">
+                        {lang === "ar" ? article.titleAr : article.titleEn}
+                      </h3>
+                      <p className="text-qirat-navy/55 text-xs leading-relaxed line-clamp-2">
+                        {lang === "ar" ? article.excerptAr : article.excerptEn}
+                      </p>
+                      <span className="flex items-center gap-1 mt-3 text-qirat-gold text-xs font-bold">
+                        {t("اقرأ المزيد", "Read more")}
+                        {lang === "ar" ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="text-base font-black text-qirat-navy mb-2 line-clamp-2 leading-snug">
-                    {lang === "ar" ? article.titleAr : article.titleEn}
-                  </h3>
-                  <p className="text-qirat-navy/55 text-xs leading-relaxed line-clamp-2">
-                    {lang === "ar" ? article.excerptAr : article.excerptEn}
-                  </p>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
