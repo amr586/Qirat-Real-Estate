@@ -5,12 +5,12 @@ import { useLocation } from "wouter";
 import { useLang } from "../contexts/LanguageContext";
 
 const UNIT_TYPES = [
-  { ar: "شقة", en: "Apartment" },
-  { ar: "فيلا", en: "Villa" },
-  { ar: "بنتهاوس", en: "Penthouse" },
-  { ar: "دوبلكس", en: "Duplex" },
-  { ar: "ستوديو", en: "Studio" },
-  { ar: "وحدة تجارية", en: "Commercial" },
+  { ar: "شقة", en: "Apartment", key: "apartment" },
+  { ar: "فيلا", en: "Villa", key: "villa" },
+  { ar: "بنتهاوس", en: "Penthouse", key: "penthouse" },
+  { ar: "دوبلكس", en: "Duplex", key: "duplex" },
+  { ar: "ستوديو", en: "Studio", key: "studio" },
+  { ar: "وحدة تجارية", en: "Commercial", key: "commercial" },
 ];
 
 const BEDROOM_OPTIONS = [
@@ -199,7 +199,7 @@ export default function HomeSearch() {
                 value={unitType}
                 options={[
                   { label: t("كل الأنواع", "All Types"), val: "" },
-                  ...UNIT_TYPES.map((u) => ({ label: t(u.ar, u.en), val: u.ar })),
+                  ...UNIT_TYPES.map((u) => ({ label: t(u.ar, u.en), val: u.key })),
                 ]}
                 onChange={setUnitType}
               />

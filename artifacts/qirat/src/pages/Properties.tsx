@@ -248,6 +248,21 @@ export default function Properties() {
   const [minArea, setMinArea] = useState(params.get("minArea") || "");
   const [maxArea, setMaxArea] = useState(params.get("maxArea") || "");
   const [featuredOnly, setFeaturedOnly] = useState(params.get("featured") === "1");
+  const [bedrooms, setBedrooms] = useState(params.get("bedrooms") || "");
+
+  useEffect(() => {
+    setSearchText(params.get("q") || "");
+    setUnitType(params.get("unitType") || "");
+    setPurpose(params.get("purpose") || "");
+    setZone(params.get("location") || "");
+    setAdType((params.get("type") as "sale" | "rent" | "") || "");
+    setMinPrice(params.get("minPrice") || "");
+    setMaxPrice(params.get("maxPrice") || "");
+    setMinArea(params.get("minArea") || "");
+    setMaxArea(params.get("maxArea") || "");
+    setFeaturedOnly(params.get("featured") === "1");
+    setBedrooms(params.get("bedrooms") || "");
+  }, [searchString]);
 
   const zones = useMemo(() => {
     const seen = new Set<string>();
@@ -266,7 +281,7 @@ export default function Properties() {
     ...zones.map((z) => ({ key: z.ar, ar: z.ar, en: z.en })),
   ], [zones]);
 
-  const hasActiveFilters = searchText || unitType || purpose || zone || adType || minPrice || maxPrice || minArea || maxArea || featuredOnly;
+  const hasActiveFilters = searchText || unitType || purpose || zone || adType || minPrice || maxPrice || minArea || maxArea || featuredOnly || bedrooms;
 
   const clearFilters = () => {
     setSearchText("");
@@ -279,6 +294,7 @@ export default function Properties() {
     setMinArea("");
     setMaxArea("");
     setFeaturedOnly(false);
+    setBedrooms("");
   };
 
   const filtered = useMemo(() => {
@@ -303,6 +319,15 @@ export default function Properties() {
 
       if (adType && p.type !== adType) return false;
 
+      if (bedrooms) {
+        const minBeds = parseInt(bedrooms, 10);
+        if (bedrooms === "5") {
+          if (p.bedrooms < 5) return false;
+        } else {
+          if (p.bedrooms !== minBeds) return false;
+        }
+      }
+
       const numericPrice = parseNumericPrice(p.price);
       if (minPrice && numericPrice < parseInt(minPrice, 10)) return false;
       if (maxPrice && numericPrice > parseInt(maxPrice, 10)) return false;
@@ -314,9 +339,9 @@ export default function Properties() {
 
       return true;
     });
-  }, [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly]);
+  }, [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly, bedrooms]);
 
-  const activeCount = [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly].filter(Boolean).length;
+  const activeCount = [searchText, unitType, purpose, zone, adType, minPrice, maxPrice, minArea, maxArea, featuredOnly, bedrooms].filter(Boolean).length;
 
   return (
     <div dir={dir} className="pt-20">
