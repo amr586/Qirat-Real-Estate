@@ -572,96 +572,55 @@ export default function PropertyDetail() {
                 ? `https://www.google.com/maps?q=${lat},${lng}`
                 : `https://www.google.com/maps/search/${encodeURIComponent(locationName)}`;
               const osmSrc = lat && lng
-                ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}&layer=mapnik&marker=${lat}%2C${lng}`
-                : `https://www.openstreetmap.org/export/embed.html?bbox=31.1700%2C29.9700%2C31.3100%2C30.0800&layer=mapnik`;
+                ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.018}%2C${lat - 0.013}%2C${lng + 0.018}%2C${lat + 0.013}&layer=mapnik&marker=${lat}%2C${lng}`
+                : `https://www.openstreetmap.org/export/embed.html?bbox=31.17%2C29.97%2C31.55%2C30.21&layer=mapnik`;
 
               return (
                 <motion.div
-                  className="bg-white rounded-3xl p-8 shadow-sm flex flex-col items-center"
+                  className="bg-white rounded-3xl overflow-hidden shadow-sm"
                   variants={fadeUp} initial="hidden" animate="visible" custom={7}
                 >
-                  <h2 className="text-xl font-bold text-qirat-navy mb-2 self-start">{t("موقع العقار", "Property Location")}</h2>
-                  <a
-                    href={mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-qirat-navy/50 hover:text-qirat-gold text-sm mb-7 self-start flex items-center gap-1.5 transition-colors"
-                  >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 pt-6 pb-4">
+                    <h2 className="text-xl font-bold text-qirat-navy flex items-center gap-2">
+                      <Navigation className="w-5 h-5 text-qirat-gold" />
+                      {t("موقع العقار", "Property Location")}
+                    </h2>
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                      style={{ background: "rgba(201,168,76,0.12)", color: "#9A7A2E", border: "1px solid rgba(201,168,76,0.3)" }}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      {t("فتح في جوجل مابس", "Open in Google Maps")}
+                    </a>
+                  </div>
+
+                  {/* Location label */}
+                  <div className="px-6 pb-3 flex items-center gap-1.5 text-sm text-qirat-navy/60">
                     <MapPin className="w-3.5 h-3.5 text-qirat-gold flex-shrink-0" />
                     {locationName}
-                  </a>
+                  </div>
 
-                  <a
-                    href={mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative flex items-center justify-center group"
-                    style={{ width: 290, height: 290 }}
-                    title={t("افتح في خرائط جوجل", "Open in Google Maps")}
-                  >
-                    {/* Pulse rings */}
-                    <motion.div
-                      className="absolute rounded-full pointer-events-none"
-                      style={{ width: 286, height: 286, border: "2px solid rgba(201,168,76,0.2)" }}
-                      animate={{ scale: [1, 1.07, 1], opacity: [0.5, 0.1, 0.5] }}
-                      transition={{ duration: 3, repeat: Infinity }}
+                  {/* Interactive map */}
+                  <div className="relative w-full" style={{ height: 380 }}>
+                    <iframe
+                      src={osmSrc}
+                      width="100%"
+                      height="380"
+                      style={{ border: 0, display: "block" }}
+                      title={locationName}
+                      loading="lazy"
+                      allowFullScreen
                     />
-                    <motion.div
-                      className="absolute rounded-full pointer-events-none"
-                      style={{ width: 274, height: 274, border: "1.5px solid rgba(201,168,76,0.3)" }}
-                      animate={{ scale: [1, 1.05, 1], opacity: [0.6, 0.15, 0.6] }}
-                      transition={{ duration: 2.4, repeat: Infinity, delay: 0.6 }}
-                    />
-
-                    {/* Map circle */}
+                    {/* Bottom gradient fade */}
                     <div
-                      className="rounded-full flex items-center justify-center"
-                      style={{
-                        width: 264, height: 264, padding: 5,
-                        background: "linear-gradient(135deg, #C9A84C 0%, #F0D98A 45%, #A8872E 100%)",
-                        boxShadow: "0 0 28px rgba(201,168,76,0.45), 0 0 60px rgba(201,168,76,0.12)",
-                      }}
-                    >
-                      <div className="relative rounded-full overflow-hidden" style={{ width: 254, height: 254 }}>
-                        <iframe
-                          src={osmSrc}
-                          width="254" height="254"
-                          style={{ border: 0, display: "block", pointerEvents: "none" }}
-                          title={locationName}
-                          loading="lazy"
-                        />
-                        {/* Hover overlay */}
-                        <div
-                          className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          style={{ background: "rgba(27,58,107,0.72)", backdropFilter: "blur(2px)" }}
-                        >
-                          <ExternalLink className="w-7 h-7 text-qirat-gold" />
-                          <span className="text-white text-xs font-bold text-center px-4 leading-snug">
-                            {t("افتح في خرائط جوجل", "Open in Google Maps")}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Location pill */}
-                    <motion.div
-                      className="absolute -bottom-3 left-1/2 -translate-x-1/2 pointer-events-none"
-                      animate={{ y: [0, -4, 0] }}
-                      transition={{ duration: 2.2, repeat: Infinity }}
-                    >
-                      <div
-                        className="px-4 py-1.5 rounded-full text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap"
-                        style={{
-                          background: "linear-gradient(135deg, #1B3A6B, #0F2347)",
-                          border: "1px solid rgba(201,168,76,0.45)",
-                          boxShadow: "0 4px 14px rgba(27,58,107,0.3)",
-                        }}
-                      >
-                        <MapPin className="w-3 h-3 text-qirat-gold" />
-                        {locationName}
-                      </div>
-                    </motion.div>
-                  </a>
+                      className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none"
+                      style={{ background: "linear-gradient(to top, rgba(255,255,255,0.6), transparent)" }}
+                    />
+                  </div>
                 </motion.div>
               );
             })()}
