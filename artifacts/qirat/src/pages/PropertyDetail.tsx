@@ -89,110 +89,186 @@ export default function PropertyDetail() {
       <AnimatePresence>
         {lightbox && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setLightbox(false)}
           >
-            <button className="absolute top-5 right-5 text-white/70 hover:text-white" onClick={() => setLightbox(false)}>
-              <X className="w-8 h-8" />
-            </button>
-            <button className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2" onClick={(e) => { e.stopPropagation(); prevImg(); }}>
-              <ChevronLeft className="w-9 h-9" />
-            </button>
-            <img
-              src={gallery[activeImg]}
-              alt=""
-              className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <button className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2" onClick={(e) => { e.stopPropagation(); nextImg(); }}>
-              <ChevronRight className="w-9 h-9" />
-            </button>
-            <div className="absolute bottom-5 text-white/50 text-sm">{activeImg + 1} / {gallery.length}</div>
+            {/* Top bar */}
+            <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-5 py-4 z-10">
+              <span className="text-white/60 text-sm font-medium">
+                {activeImg + 1} / {gallery.length}
+              </span>
+              <button
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+                onClick={() => setLightbox(false)}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Main image */}
+            <div className="flex items-center justify-center w-full px-16 flex-1" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                onClick={(e) => { e.stopPropagation(); prevImg(); }}
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeImg}
+                  src={gallery[activeImg]}
+                  alt=""
+                  className="max-h-[72vh] max-w-full rounded-2xl object-contain shadow-2xl"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.25 }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </AnimatePresence>
+
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
+                onClick={(e) => { e.stopPropagation(); nextImg(); }}
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Thumbnail strip */}
+            {gallery.length > 1 && (
+              <div
+                className="flex gap-2 px-4 pb-4 pt-3 overflow-x-auto"
+                style={{ maxWidth: "100vw" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {gallery.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    className="flex-shrink-0 rounded-xl overflow-hidden transition-all"
+                    style={{
+                      width: 72, height: 52,
+                      outline: i === activeImg ? "2px solid #C9A84C" : "2px solid transparent",
+                      outlineOffset: 2,
+                      opacity: i === activeImg ? 1 : 0.5,
+                    }}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Hero Gallery ── */}
-      <div className="relative h-80 md:h-[520px] overflow-hidden group cursor-pointer" onClick={() => setLightbox(true)}>
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={activeImg}
-            src={gallery[activeImg]}
-            alt={lang === "ar" ? property.titleAr : property.titleEn}
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45 }}
-          />
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-
-        {/* Zoom hint */}
-        <div className="absolute top-4 right-4 bg-black/40 text-white/80 text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ZoomIn className="w-3.5 h-3.5" /> {t("تكبير", "Zoom")}
+      {/* ── Mosaic Gallery ── */}
+      <div style={{ background: "#0F2347" }} className="pt-20">
+        {/* Title bar over dark bg */}
+        <div className="max-w-7xl mx-auto px-4 pt-8 pb-4">
+          <span
+            className="px-4 py-1.5 rounded-full text-sm font-bold text-white mb-3 inline-block"
+            style={{ background: typeColors[property.type] }}
+          >
+            {lang === "ar" ? property.typeAr : property.typeEn}
+          </span>
+          <h1
+            className="text-3xl md:text-4xl font-black text-white mb-1"
+            style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
+          >
+            {lang === "ar" ? property.titleAr : property.titleEn}
+          </h1>
+          <a
+            href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? property.locationAr : property.locationEn)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-white/60 hover:text-qirat-gold transition-colors text-sm"
+          >
+            <MapPin className="w-4 h-4 text-qirat-gold" />
+            <span>{lang === "ar" ? property.locationAr : property.locationEn}</span>
+          </a>
         </div>
 
-        {/* Gallery nav arrows */}
-        {gallery.length > 1 && (
-          <>
-            <button
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors"
-              onClick={(e) => { e.stopPropagation(); prevImg(); }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors"
-              onClick={(e) => { e.stopPropagation(); nextImg(); }}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
-        )}
-
-        {/* Thumbnails */}
-        {gallery.length > 1 && (
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
+        {/* Photo grid */}
+        <div className="max-w-7xl mx-auto px-4 pb-0">
+          {/* Mobile: horizontal scroll */}
+          <div className="flex md:hidden gap-2 overflow-x-auto pb-3" style={{ scrollbarWidth: "none" }}>
             {gallery.map((img, i) => (
               <button
                 key={i}
-                onClick={(e) => { e.stopPropagation(); setActiveImg(i); }}
-                className={`w-14 h-10 rounded-lg overflow-hidden border-2 transition-all ${i === activeImg ? "border-qirat-gold scale-110" : "border-white/40 opacity-60"}`}
+                className="flex-shrink-0 rounded-2xl overflow-hidden"
+                style={{ width: 260, height: 180 }}
+                onClick={() => { setActiveImg(i); setLightbox(true); }}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </button>
             ))}
           </div>
-        )}
 
-        {/* Title overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-          <div className="max-w-7xl mx-auto">
-            <span
-              className="px-4 py-1.5 rounded-full text-sm font-bold text-white mb-3 inline-block"
-              style={{ background: typeColors[property.type] }}
+          {/* Desktop: mosaic grid */}
+          <div className="hidden md:grid gap-2" style={{
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateRows: "240px 240px",
+          }}>
+            {/* Main large image — spans 2 rows, 2 cols */}
+            <div
+              className="relative rounded-2xl overflow-hidden cursor-pointer group"
+              style={{ gridColumn: "1 / 3", gridRow: "1 / 3" }}
+              onClick={() => { setActiveImg(0); setLightbox(true); }}
             >
-              {lang === "ar" ? property.typeAr : property.typeEn}
-            </span>
-            <h1
-              className="text-3xl md:text-5xl font-black text-white mb-2"
-              style={{ fontFamily: lang === "ar" ? "Cairo, sans-serif" : "Montserrat, sans-serif" }}
+              <img
+                src={gallery[0]}
+                alt=""
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
+              <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-sm text-white/90 text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ZoomIn className="w-3 h-3" /> {t("تكبير", "Zoom")}
+              </div>
+            </div>
+
+            {/* Side images — each 1 col, 1 row */}
+            {gallery.slice(1, 4).map((img, i) => {
+              const isLast = i === 2 && gallery.length > 4;
+              return (
+                <div
+                  key={i}
+                  className="relative rounded-2xl overflow-hidden cursor-pointer group"
+                  onClick={() => { setActiveImg(i + 1); setLightbox(true); }}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    style={{ filter: isLast ? "brightness(0.5)" : undefined }}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
+                  {isLast && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                      <span className="text-3xl font-black">+{gallery.length - 4}</span>
+                      <span className="text-sm text-white/80 mt-1">{t("صورة أخرى", "more photos")}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* "Show all photos" button */}
+          <div className="hidden md:flex justify-end pb-4 pt-2">
+            <button
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}
+              onClick={() => { setActiveImg(0); setLightbox(true); }}
             >
-              {lang === "ar" ? property.titleAr : property.titleEn}
-            </h1>
-            <a
-              href={`https://www.google.com/maps/search/${encodeURIComponent(lang === "ar" ? property.locationAr : property.locationEn)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-white/80 hover:text-qirat-gold transition-colors"
-            >
-              <MapPin className="w-4 h-4 text-qirat-gold" />
-              <span>{lang === "ar" ? property.locationAr : property.locationEn}</span>
-            </a>
+              <ZoomIn className="w-4 h-4 text-qirat-gold" />
+              {t(`عرض كل الصور (${gallery.length})`, `Show all photos (${gallery.length})`)}
+            </button>
           </div>
         </div>
       </div>
